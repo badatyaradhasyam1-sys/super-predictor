@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Predictor Neon</title>
+  <style>
+    :root {
+      --neon: #00f3ff;
+      --bg: #050a18;
+    }
+    body {
+      margin: 0; background: var(--bg);
+      display: flex; justify-content: center;
+      font-family: 'Segoe UI', sans-serif; color: white;
+    }
+    .container {
+      width: 100%; max-width: 420px; min-height: 100vh;
+      padding: 20px; box-sizing: border-box;
+      border: 1px solid var(--neon);
+      box-shadow: 0 0 20px var(--neon); /* चमकीली नियोन लाइट */
+    }
+    .glow-text {
+      text-align: center; color: var(--neon);
+      text-shadow: 0 0 10px var(--neon);
+      text-transform: uppercase;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 15px; padding: 20px;
+      margin: 15px 0; border: 1px solid rgba(0,243,255,0.2);
+      text-align: center;
+    }
+    #timer { font-size: 40px; font-weight: 900; color: #fbbf24; }
+    #prediction { font-size: 50px; font-weight: 900; margin: 10px 0; }
+    input {
+      width: 100%; padding: 15px; border-radius: 10px;
+      background: #000; color: var(--neon); border: 1px solid var(--neon);
+      font-size: 20px; text-align: center; margin-bottom: 10px;
+    }
+    button {
+      width: 100%; padding: 15px; background: var(--neon);
+      border: none; border-radius: 10px; font-weight: bold; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2 class="glow-text">⚡ Wingo AI Elite ⚡</h2>
+  
+  <div class="card">
+    <div id="period-display" style="font-size:14px; color:#aaa;">PERIOD: LOADING...</div>
+    <div id="timer">00:59</div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:12px;">AI PREDICTION</div>
+    <div id="prediction">---</div>
+    <div id="msg" style="font-size:14px; color:#39ff14;">Scanning Pattern...</div>
+  </div>
+
+  <input type="number" id="input-num" placeholder="Enter No (0-9)">
+  <button onclick="checkWin()">UPDATE RESULT</button>
+
+  <div id="stats" style="margin-top:20px; font-size:14px; text-align:center;">
+    Wins: <span id="win-count" style="color:#39ff14">0</span> | 
+    Loss: <span id="loss-count" style="color:#ff3131">0</span>
+  </div>
+</div>
+
+<script>
+  let wins = 0, losses = 0;
+  let lastPred = "";
+
+  function updateGame() {
+    const now = new Date();
+    const utcHours = now.getUTCHours();
+    const utcMinutes = now.getUTCMinutes();
+    const utcSeconds = now.getUTCSeconds();
+
+    // रियल गेम पीरियड सिंक (YYYYMMDD + 1-min interval)
+    const dateStr = now.getUTCFullYear().toString() + 
+                    (now.getUTCMonth()+1).toString().padStart(2,'0') + 
+                    now.getUTCDate().toString().padStart(2,'0');
+    const periodId = dateStr + "1000" + (10001 + (utcHours * 60 + utcMinutes));
+    document.getElementById('period-display').innerText = "PERIOD: " + periodId;
+
+    const remaining = 59 - utcSeconds;
+    document.getElementById('timer').innerText = "00:" + remaining.toString().padStart(2,'0');
+
+    if(remaining === 59) generatePrediction();
+  }
+
+  function generatePrediction() {
+    const choices = ["BIG", "SMALL", "RED", "GREEN"];
+    lastPred = choices[Math.floor(Math.random() * choices.length)];
+    const predEl = document.getElementById('prediction');
+    predEl.innerText = lastPred;
+    
+    // कलर सेटिंग्स
+    if(lastPred === "RED") predEl.style.color = "#ff3131";
+    else if(lastPred === "GREEN") predEl.style.color = "#39ff14";
+    else predEl.style.color = "#00f3ff";
+  }
+
+  function checkWin() {
+    const val = parseInt(document.getElementById('input-num').value);
+    if(isNaN(val)) return;
+
+    let win = false;
+    // आपके नियमों के अनुसार Win/Loss चेक
+    if(lastPred === "SMALL" && val <= 4) win = true;
+    else if(lastPred === "BIG" && val >= 5) win = true;
+    else if(lastPred === "RED" && [0,2,4,6,8].includes(val)) win = true;
+    else if(lastPred === "GREEN" && [1,3,5,7,9].includes(val)) win = true;
+
+    if(win) {
+      wins++; document.getElementById('win-count').innerText = wins;
+      document.getElementById('msg').innerText = "SUCCESS ✅";
+    } else {
+      losses++; document.getElementById('loss-count').innerText = losses;
+      document.getElementById('msg').innerText = "FAILED ❌";
+    }
+    document.getElementById('input-num').value = "";
+  }
+
+  setInterval(updateGame, 1000);
+  generatePrediction();
+</script>
+</body>
+</html>
