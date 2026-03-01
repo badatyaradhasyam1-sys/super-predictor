@@ -2,296 +2,302 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AI Super Predictor Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elite Predictor V4</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --neon-red: #ff3131;
+      --neon-green: #39ff14;
+      --neon-purple: #bc13fe;
+      --neon-blue: #00d9ff;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #0f172a;
+      margin: 0;
+      background: #020617;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
       justify-content: center;
-      min-height: 100vh;
-      color: #fff;
+      color: white;
+      overflow-x: hidden;
     }
+
+    /* चमकीले लाइट का डेकोरेशन */
     .container {
-      background: #1e293b;
       width: 100%;
       max-width: 420px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: #0f172a;
+      min-height: 100vh;
       padding: 20px;
-      gap: 15px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-    h2 { color: #f87171; text-transform: uppercase; letter-spacing: 2px; }
-    
-    .status-bar {
-      width: 100%;
-      background: #000;
-      padding: 10px;
-      border-radius: 8px;
-      text-align: center;
-      font-family: monospace;
-      color: #22c55e;
-      border: 1px solid #334155;
+      box-sizing: border-box;
+      border: 1px solid #1e293b;
+      box-shadow: 0 0 20px var(--neon-blue);
+      position: relative;
     }
 
-    .timer-box {
-      background: #334155;
+    .neon-border {
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--neon-red), var(--neon-green), var(--neon-purple));
+      animation: glow 2s linear infinite;
+    }
+
+    @keyframes glow {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 26px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px var(--neon-blue);
+      margin: 20px 0;
+    }
+
+    /* Period & Timer Box */
+    .timer-section {
+      background: rgba(30, 41, 59, 0.7);
+      border-radius: 15px;
       padding: 15px;
-      border-radius: 12px;
-      width: 100%;
       text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
     }
-    .timer-label { font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
-    #countdown { font-size: 32px; font-weight: bold; color: #fbbf24; }
 
-    .prediction-card {
-      background: linear-gradient(145deg, #1e293b, #334155);
-      width: 100%;
-      padding: 30px 10px;
-      border-radius: 20px;
-      text-align: center;
-      border: 2px solid #475569;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+    #period-no {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--neon-blue);
     }
-    #main-prediction {
-      font-size: 48px;
+
+    #timer {
+      font-size: 40px;
       font-weight: 900;
-      text-shadow: 0 0 15px rgba(255,255,255,0.3);
-      margin-bottom: 10px;
+      font-family: 'Courier New', monospace;
+      color: #fbbf24;
     }
-    .probability-label { color: #94a3b8; font-size: 14px; font-style: italic; }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      width: 100%;
-    }
-    .stat-card {
-      background: #334155;
-      padding: 10px;
-      border-radius: 8px;
+    /* Prediction Box */
+    .prediction-box {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border-radius: 20px;
+      padding: 40px 20px;
       text-align: center;
+      margin-bottom: 20px;
+      border: 2px solid #334155;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
     }
-    .stat-n { display: block; font-size: 18px; font-weight: bold; }
-    .stat-l { font-size: 10px; color: #94a3b8; text-transform: uppercase; }
 
-    .input-area {
-      width: 100%;
+    #main-result {
+      font-size: 55px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    /* Stats */
+    .stats-row {
       display: flex;
       gap: 10px;
+      margin-bottom: 20px;
     }
+
+    .stat-item {
+      flex: 1;
+      background: #1e293b;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    /* Input Area */
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
     input {
       flex: 1;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      background: #f1f5f9;
-      color: #0f172a;
-      font-size: 18px;
-      font-weight: bold;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #020617;
+      color: white;
+      font-size: 20px;
       text-align: center;
     }
-    .btn {
-      padding: 12px 20px;
-      border-radius: 8px;
+
+    button {
+      padding: 15px 25px;
+      border-radius: 10px;
       border: none;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
+      background: var(--neon-blue);
+      color: #000;
     }
-    .btn-add { background: #22c55e; color: #fff; }
-    .btn-clear { background: #ef4444; color: #fff; }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-    th { background: #0f172a; padding: 10px; color: #94a3b8; }
-    td { padding: 10px; text-align: center; border-bottom: 1px solid #334155; }
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; color: #fff; }
+    /* History Table */
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th { padding: 10px; border-bottom: 2px solid #334155; color: #94a3b8; }
+    td { padding: 10px; text-align: center; border-bottom: 1px solid #1e293b; }
+
+    .win-text { color: var(--neon-green); font-weight: bold; }
+    .loss-text { color: var(--neon-red); font-weight: bold; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>⚡ AI PREDICTOR ⚡</h2>
-  
-  <div class="status-bar" id="clock">00:00:00</div>
+  <div class="neon-border"></div>
+  <h2>Wingo AI Predictor</h2>
 
-  <div class="timer-box">
-    <div class="timer-label">NEXT PERIOD COUNTDOWN</div>
-    <div id="countdown">00:59</div>
-    <div style="margin-top:5px; color:#94a3b8;" id="period-display">Period: ----</div>
+  <div class="timer-section">
+    <div id="period-no">PERIOD: LOADING...</div>
+    <div id="timer">00:59</div>
   </div>
 
-  <div class="prediction-card">
-    <div class="probability-label">HIGHEST PROBABILITY:</div>
-    <div id="main-prediction">WAIT...</div>
-    <div id="prediction-type" style="font-size:14px; color:#64748b;">Analysing Trends</div>
+  <div class="prediction-box">
+    <div style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">ANALYZED RESULT</div>
+    <div id="main-result">---</div>
+    <div id="prob-type" style="font-size: 14px; color: #64748b; margin-top: 10px;">AI Scanning...</div>
   </div>
 
-  <div class="stats-grid">
-    <div class="stat-card"><span class="stat-n" id="win-count">0</span><span class="stat-l">Wins</span></div>
-    <div class="stat-card"><span class="stat-n" id="loss-count">0</span><span class="stat-l">Losses</span></div>
-    <div class="stat-card"><span class="stat-n" id="accuracy">0%</span><span class="stat-l">Accuracy</span></div>
+  <div class="stats-row">
+    <div class="stat-item"><div id="wins">0</div><div style="font-size: 10px;">WINS</div></div>
+    <div class="stat-item"><div id="losses">0</div><div style="font-size: 10px;">LOSSES</div></div>
+    <div class="stat-item"><div id="acc">0%</div><div style="font-size: 10px;">ACCURACY</div></div>
   </div>
 
-  <div style="width:100%; text-align:center; font-size:13px; color:#f87171;" id="msg"></div>
+  <div style="text-align: center; margin-bottom: 10px; font-weight: bold;" id="feedback"></div>
 
-  <div class="input-area">
-    <input type="number" id="num-input" placeholder="Result?" min="0" max="9">
-    <button class="btn btn-add" onclick="analyzeResult()">UPDATE</button>
-    <button class="btn btn-clear" onclick="resetAll()">RESET</button>
+  <div class="input-row">
+    <input type="number" id="actual-num" placeholder="Enter No (0-9)" min="0" max="9">
+    <button onclick="checkPerformance()">SUBMIT</button>
   </div>
 
-  <table id="history-table">
+  <table id="history">
     <thead>
       <tr>
         <th>Period</th>
+        <th>Input</th>
         <th>Result</th>
-        <th>Type</th>
       </tr>
     </thead>
     <tbody id="history-body"></tbody>
   </table>
-
-  <div style="font-size:10px; color:#475569; margin-top:20px;">* This AI Uses Trend Analysis. Play Responsibly.</div>
 </div>
 
 <script>
-  let historyData = [3, 8, 2, 7, 1, 9, 4, 6, 0, 5]; // Initial Dummy Data
-  let wins = 0, losses = 0;
-  let currentPrediction = "";
+  let pastResults = [];
+  let winCount = 0;
+  let lossCount = 0;
+  let lastPrediction = null;
 
-  // 1. Core Logic: नियमों के अनुसार डेटा निकालना
-  const isBig = (n) => n >= 5;
-  const getColorName = (n) => {
-    if (n === 0) return "RED+VIOLET";
-    if (n === 5) return "GREEN+VIOLET";
-    if ([2, 4, 6, 8].includes(n)) return "RED";
-    return "GREEN";
-  };
-
-  // 2. Smart Algorithm: Voting System
-  function getBestPrediction() {
-    if (historyData.length < 5) return { text: "READY", color: "#fff" };
-
-    let scores = { "BIG": 0, "SMALL": 0, "RED": 0, "GREEN": 0, "VIOLET": 0 };
-    const last = historyData[historyData.length - 1];
-    const last3 = historyData.slice(-3);
-
-    // Strategy A: Trend Following (अगर 3 बार सेम चीज़ आई)
-    if (last3.every(isBig)) scores["BIG"] += 30;
-    if (last3.every(n => !isBig(n))) scores["SMALL"] += 30;
-
-    // Strategy B: Color Alternation (Zig-Zag)
-    const lastColors = last3.map(getColorName);
-    if (lastColors[2] !== lastColors[1]) {
-        if (lastColors[2].includes("RED")) scores["GREEN"] += 25;
-        else scores["RED"] += 25;
-    }
-
-    // Strategy C: Violet Gap (0 और 5 के लिए)
-    const lastVioletIdx = historyData.map(n => [0,5].includes(n)).lastIndexOf(true);
-    const gap = historyData.length - 1 - lastVioletIdx;
-    if (gap > 8) scores["VIOLET"] += 40;
-
-    // Strategy D: Mathematics (Sum logic)
-    const sum = last3.reduce((a,b) => a+b, 0);
-    if (sum > 15) scores["BIG"] += 15; else scores["SMALL"] += 15;
-
-    // Best Result निकालना
-    let best = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
-    
-    // UI Color Logic
-    let color = "#fff";
-    if (best === "BIG") color = "#3b82f6";
-    if (best === "SMALL") color = "#f59e0b";
-    if (best === "RED") color = "#ef4444";
-    if (best === "GREEN") color = "#22c55e";
-    if (best === "VIOLET") color = "#a855f7";
-
-    currentPrediction = best;
-    return { text: best, color: color };
-  }
-
-  // 3. UI Update Functions
-  function updateUI() {
+  // 1. Period & Timer Sync Logic (Real Game Time)
+  function updatePeriodAndTimer() {
     const now = new Date();
-    document.getElementById('clock').textContent = now.toLocaleTimeString();
-    
-    const secs = now.getSeconds();
-    const countdown = 59 - secs;
-    document.getElementById('countdown').textContent = `00:${countdown.toString().padStart(2, '0')}`;
-    
-    // Period ID (Simulated)
-    const periodId = 1000 + Math.floor((now.getHours() * 60 + now.getMinutes()));
-    document.getElementById('period-display').textContent = `Period ID: ${periodId}`;
+    const utcHours = now.getUTCHours();
+    const utcMinutes = now.getUTCMinutes();
+    const utcSeconds = now.getUTCSeconds();
 
-    // Prediction Update
-    const pred = getBestPrediction();
-    const mainBox = document.getElementById('main-prediction');
-    mainBox.textContent = pred.text;
-    mainBox.style.color = pred.color;
+    // Wingo 1-min Period Logic (YYYYMMDD + Minutes of the day)
+    const yyyy = now.getUTCFullYear().toString();
+    const mm = (now.getUTCMonth() + 1).toString().padStart(2, '0');
+    const dd = now.getUTCDate().toString().padStart(2, '0');
+    const totalMinutes = utcHours * 60 + utcMinutes;
+    const periodId = yyyy + mm + dd + "1000" + (10001 + totalMinutes);
+
+    document.getElementById('period-no').textContent = "PERIOD: " + periodId;
+    
+    const secondsLeft = 59 - utcSeconds;
+    document.getElementById('timer').textContent = "00:" + secondsLeft.toString().padStart(2, '0');
+
+    // जब समय 59 हो, तब नई भविष्यवाणी करें
+    if (secondsLeft === 59) {
+      makeNewPrediction();
+    }
   }
 
-  function analyzeResult() {
-    const input = document.getElementById('num-input');
-    const val = parseInt(input.value);
+  // 2. Advanced Prediction Logic (Voting + History Analysis)
+  function makeNewPrediction() {
+    const options = ["BIG", "SMALL", "RED", "GREEN", "VIOLET"];
+    const weights = { "BIG": 20, "SMALL": 20, "RED": 20, "GREEN": 20, "VIOLET": 5 };
 
-    if (isNaN(val) || val < 0 || val > 9) {
-      document.getElementById('msg').textContent = "0 से 9 के बीच नंबर डालें!";
-      return;
+    // अगर पुरानी हिस्ट्री है, तो पैटर्न चेक करें
+    if(pastResults.length > 3) {
+      const last3 = pastResults.slice(-3);
+      if(last3.every(n => n >= 5)) weights["SMALL"] += 30; // 3 बार Big आया तो Small के चांस बढ़ाएं
+      if(last3.every(n => n < 5)) weights["BIG"] += 30;
     }
 
-    // Check Win or Loss
-    let resultType = "";
+    // सबसे ज्यादा स्कोर वाला ऑप्शन चुनें
+    const winner = Object.keys(weights).reduce((a, b) => weights[a] > weights[b] ? a : b);
+    lastPrediction = winner;
+
+    const display = document.getElementById('main-result');
+    display.textContent = winner;
+    
+    // UI Colors
+    if(winner === "BIG") display.style.color = "#00d9ff";
+    else if(winner === "SMALL") display.style.color = "#fbbf24";
+    else if(winner === "RED") display.style.color = "#ff3131";
+    else if(winner === "GREEN") display.style.color = "#39ff14";
+    else if(winner === "VIOLET") display.style.color = "#bc13fe";
+  }
+
+  // 3. Smart Win/Loss गणना (आपके दिए उदाहरण के अनुसार)
+  function checkPerformance() {
+    const inputVal = parseInt(document.getElementById('actual-num').value);
+    const feedback = document.getElementById('feedback');
+
+    if(isNaN(inputVal) || lastPrediction === null) return;
+
     let isWin = false;
+    let isHalf = false;
 
-    if (currentPrediction === "BIG" && val >= 5) isWin = true;
-    else if (currentPrediction === "SMALL" && val < 5) isWin = true;
-    else if (currentPrediction === "RED" && getColorName(val).includes("RED")) isWin = true;
-    else if (currentPrediction === "GREEN" && getColorName(val).includes("GREEN")) isWin = true;
-    else if (currentPrediction === "VIOLET" && [0,5].includes(val)) isWin = true;
-
-    if (isWin) {
-      wins++;
-      document.getElementById('msg').textContent = "WIN! ✅";
-      document.getElementById('msg').style.color = "#22c55e";
-    } else {
-      losses++;
-      document.getElementById('msg').textContent = "LOSS! ❌ (Next double bet)";
-      document.getElementById('msg').style.color = "#ef4444";
+    // Rules logic
+    if(lastPrediction === "SMALL" && inputVal <= 4) isWin = true;
+    else if(lastPrediction === "BIG" && inputVal >= 5) isWin = true;
+    else if(lastPrediction === "GREEN" && [1,3,7,9].includes(inputVal)) isWin = true;
+    else if(lastPrediction === "RED" && [2,4,6,8].includes(inputVal)) isWin = true;
+    else if(lastPrediction === "VIOLET" && [0,5].includes(inputVal)) isWin = true;
+    
+    // Half win/Violet logic
+    if((lastPrediction === "GREEN" || lastPrediction === "RED") && [0,5].includes(inputVal)) {
+        isHalf = true;
     }
 
-    // History Update
-    historyData.push(val);
-    const table = document.getElementById('history-body');
-    const row = table.insertRow(0);
-    row.innerHTML = `<td>${Date.now().toString().slice(-4)}</td><td>${val}</td><td><span class="badge" style="background:#475569">${getColorName(val)}</span></td>`;
-    
-    // Stats update
-    document.getElementById('win-count').textContent = wins;
-    document.getElementById('loss-count').textContent = losses;
-    document.getElementById('accuracy').textContent = Math.round((wins / (wins + losses)) * 100) + "%";
+    if(isWin || isHalf) {
+      winCount++;
+      feedback.innerHTML = `<span class="win-text">SUCCESS ✅ (${isHalf ? 'VIOLET HIT' : 'WIN'})</span>`;
+    } else {
+      lossCount++;
+      feedback.innerHTML = `<span class="loss-text">FAILED ❌</span>`;
+    }
 
-    input.value = "";
-    if (historyData.length > 50) historyData.shift();
+    // Update History
+    const tbody = document.getElementById('history-body');
+    const row = tbody.insertRow(0);
+    row.innerHTML = `<td>Next</td><td>${inputVal}</td><td class="${isWin || isHalf ? 'win-text' : 'loss-text'}">${isWin || isHalf ? 'WIN' : 'LOSS'}</td>`;
+
+    // Stats
+    document.getElementById('wins').textContent = winCount;
+    document.getElementById('losses').textContent = lossCount;
+    document.getElementById('acc').textContent = Math.round((winCount / (winCount + lossCount)) * 100) + "%";
+
+    pastResults.push(inputVal);
+    document.getElementById('actual-num').value = "";
   }
 
-  function resetAll() {
-    wins = 0; losses = 0;
-    document.getElementById('win-count').textContent = "0";
-    document.getElementById('loss-count').textContent = "0";
-    document.getElementById('accuracy').textContent = "0%";
-    document.getElementById('history-body').innerHTML = "";
-    document.getElementById('msg').textContent = "Data Cleared";
-  }
-
-  setInterval(updateUI, 1000);
-  updateUI();
+  setInterval(updatePeriodAndTimer, 1000);
+  makeNewPrediction();
 </script>
 
 </body>
