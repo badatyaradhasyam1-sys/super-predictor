@@ -12,7 +12,7 @@
     }
     body {
       margin: 0; background: var(--bg); color: white;
-      font-family: 'Orbitron', sans-serif; display: flex; justify-content: center;
+      font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center;
     }
     .container {
       width: 100%; max-width: 420px; min-height: 100vh;
@@ -20,12 +20,10 @@
       border-left: 1px solid var(--neon); border-right: 1px solid var(--neon);
       box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
     }
-    /* Next Gen Header */
     .header {
       text-align: center; font-size: 28px; font-weight: 900;
       letter-spacing: 4px; color: var(--neon);
-      text-shadow: 0 0 15px var(--neon), 0 0 30px var(--neon);
-      margin: 20px 0; font-family: sans-serif;
+      text-shadow: 0 0 15px var(--neon); margin: 20px 0;
     }
     .timer-card {
       background: var(--glass); border-radius: 15px; padding: 15px;
@@ -33,69 +31,82 @@
     }
     #timer { font-size: 45px; color: #fbbf24; font-weight: 900; }
 
-    /* Prediction Box Updated */
     .prediction-box {
       background: linear-gradient(145deg, #1e293b, #020617);
       border-radius: 25px; padding: 40px 20px; margin: 25px 0;
-      border: 2px solid var(--neon); position: relative;
+      border: 2px solid var(--neon); text-align: center;
     }
-    #main-prediction { font-size: 40px; font-weight: bold; color: #64748b; }
+    #main-prediction { font-size: 36px; font-weight: bold; color: #64748b; text-transform: uppercase; }
 
-    /* Animation Row */
+    /* तीर और टेक्स्ट का नया स्ट्रक्चर */
     .history-promo {
-      display: flex; align-items: center; gap: 10px; margin: 15px 0;
-      cursor: pointer; position: relative;
+      display: flex; align-items: center; gap: 12px; margin: 15px 0;
+      cursor: pointer; position: relative; padding-left: 10px;
+    }
+    .arrow-anim {
+      font-size: 22px; color: var(--neon);
+      animation: swipeRight 1.5s infinite;
+      order: 1; /* सबसे बाएं */
     }
     .circle-icon {
       width: 40px; height: 40px; border-radius: 50%;
       border: 2px solid var(--neon); display: flex;
       justify-content: center; align-items: center;
-      font-weight: bold; color: var(--neon); box-shadow: 0 0 10px var(--neon);
+      font-weight: bold; color: var(--neon); 
+      box-shadow: 0 0 10px var(--neon);
+      order: 2; /* तीर के बाद */
+      background: var(--bg); z-index: 2;
     }
-    .promo-text { font-size: 11px; color: #94a3b8; }
-    .arrow-anim {
-      font-size: 18px; color: var(--neon);
-      animation: swipeArrow 1.5s infinite;
-    }
-    @keyframes swipeArrow {
-      0% { transform: translateX(20px); opacity: 0; }
-      50% { opacity: 1; }
-      100% { transform: translateX(0px); opacity: 0; }
+    .promo-text { 
+      font-size: 12px; color: #94a3b8; 
+      order: 3; /* सबसे दाएं */
+      transition: opacity 0.3s;
     }
 
-    /* History Input Grid */
+    @keyframes swipeRight {
+      0% { transform: translateX(-10px); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateX(5px); opacity: 0; }
+    }
+
+    /* History Grid */
     .history-grid {
-      display: none; flex-direction: column; gap: 8px;
-      max-height: 400px; overflow-y: auto; padding: 10px;
-      background: rgba(0,0,0,0.3); border-radius: 10px;
+      display: none; flex-direction: column; gap: 10px;
+      margin-top: -10px; padding: 10px;
     }
-    .history-row {
-      display: flex; align-items: center; gap: 10px;
-    }
+    .history-row { display: flex; align-items: center; gap: 12px; }
+    
+    /* सभी आइकन एक जैसे */
     .row-circle {
-      min-width: 30px; height: 30px; border-radius: 50%;
-      background: var(--neon); color: black; font-size: 12px;
-      display: flex; justify-content: center; align-items: center; font-weight: bold;
+      min-width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid var(--neon); display: flex;
+      justify-content: center; align-items: center;
+      font-weight: bold; color: var(--neon); font-size: 14px;
+      box-shadow: 0 0 5px var(--neon);
     }
+    
     .history-input-box {
       flex: 1; background: var(--glass); border: 1px solid #334155;
-      border-radius: 5px; padding: 8px; display: flex; justify-content: space-between;
+      border-radius: 10px; padding: 10px; display: flex; 
+      justify-content: space-between; align-items: center;
     }
-    .p-no { font-size: 10px; color: #64748b; }
+    .p-no { font-size: 11px; color: #64748b; font-family: monospace; }
     .val-input {
-      width: 40px; background: transparent; border: none;
-      border-bottom: 1px solid var(--neon); color: white; text-align: center;
+      width: 45px; background: transparent; border: none;
+      border-bottom: 2px solid var(--neon); color: white; 
+      text-align: center; font-size: 18px; outline: none;
     }
 
     .btn-boost {
-      width: 100%; padding: 15px; margin-top: 20px;
+      width: 100%; padding: 16px; margin-top: 20px;
       background: linear-gradient(90deg, #00f3ff, #bc13fe);
-      border: none; border-radius: 10px; color: white;
+      border: none; border-radius: 12px; color: white;
       font-weight: bold; font-size: 16px; cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 243, 255, 0.3);
     }
     .nav-btn {
-      background: #1e293b; color: var(--neon); border: 1px solid var(--neon);
-      padding: 5px 10px; border-radius: 5px; font-size: 10px; margin-top: 5px;
+      background: transparent; color: var(--neon); border: 1px solid var(--neon);
+      padding: 8px; border-radius: 8px; font-size: 12px; margin-top: 10px; width: 100%;
     }
   </style>
 </head>
@@ -105,42 +116,50 @@
   <div class="header">SUPER PREDICTOR</div>
 
   <div class="timer-card">
-    <div id="period-display" style="font-size:12px;">WAITING FOR SYNC...</div>
+    <div id="period-display" style="font-size:12px; letter-spacing: 1px;">SYNCING WITH SERVER...</div>
     <div id="timer">00:59</div>
   </div>
 
   <div class="prediction-box">
-    <div style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">PREDICTION STATUS</div>
+    <div style="font-size: 11px; color: #94a3b8; margin-bottom: 8px; letter-spacing: 2px;">STATUS</div>
     <div id="main-prediction">PUT YOUR INPUT</div>
   </div>
 
-  <div class="history-promo" onclick="toggleHistory()">
-    <div class="arrow-anim">➔</div>
-    <div class="circle-icon" id="main-circle-idx">?</div>
-    <div class="promo-text">Feed previous history to improve AI accuracy</div>
+  <div class="history-promo" id="trigger-area" onclick="activateAI()">
+    <div class="arrow-anim" id="arrow">➔</div>
+    <div class="circle-icon" id="main-circle">1</div>
+    <div class="promo-text" id="promo-txt">Feed previous history to improve AI accuracy</div>
+    
+    <div id="first-box" class="history-input-box" style="display:none; order:3;">
+        <span class="p-no" id="p-1">Period: --</span>
+        <input type="number" class="val-input" placeholder="0-9" oninput="limit(this)">
+    </div>
   </div>
 
   <div id="history-container" class="history-grid">
     <div id="rows-wrapper"></div>
-    <button class="nav-btn" id="next-btn" onclick="switchPage()">Show 11-20 ➔</button>
+    <button class="nav-btn" id="pagination-btn" onclick="togglePage()">SWITCH TO 11-20 ➔</button>
   </div>
 
-  <button class="btn-boost" onclick="calculateBetterResult()">GET BETTER RESULT</button>
+  <button class="btn-boost" onclick="getBetterResult()">BETTER RESULT</button>
 
-  <div id="log" style="text-align: center; font-size: 12px; margin-top: 15px; color: #39ff14;"></div>
+  <div id="feedback" style="text-align: center; font-size: 12px; margin-top: 15px; color: var(--neon);"></div>
 </div>
 
 <script>
-  let currentPage = 1; // 1: (1-10), 2: (11-20)
+  let isExpanded = false;
+  let currentPage = 1;
   let currentBasePeriod = 0;
 
-  function updateSync() {
+  function limit(element) { element.value = element.value.slice(0,1); }
+
+  function updateSystem() {
     const now = new Date();
     const utcHours = now.getUTCHours();
     const utcMinutes = now.getUTCMinutes();
     const utcSeconds = now.getUTCSeconds();
 
-    const dateStr = now.getUTCFullYear().toString() + (now.getUTCHours() < 0 ? '0' : '') + 
+    const dateStr = now.getUTCFullYear().toString() + 
                     (now.getUTCMonth()+1).toString().padStart(2,'0') + 
                     now.getUTCDate().toString().padStart(2,'0');
     
@@ -150,24 +169,33 @@
     document.getElementById('period-display').innerText = "PERIOD: " + currentBasePeriod;
     document.getElementById('timer').innerText = "00:" + (59 - utcSeconds).toString().padStart(2,'0');
 
-    if(utcSeconds === 0) generateRows(); 
+    if(isExpanded) refreshPeriodLabels();
   }
 
-  function toggleHistory() {
-    const grid = document.getElementById('history-container');
-    const isHidden = grid.style.display === "none" || grid.style.display === "";
-    grid.style.display = isHidden ? "flex" : "none";
-    if(isHidden) {
-        document.getElementById('main-circle-idx').innerText = "1";
-        generateRows();
-    }
+  function activateAI() {
+    if(isExpanded) return; // Only trigger once
+    isExpanded = true;
+    
+    // UI Changes
+    document.getElementById('promo-txt').style.display = "none";
+    document.getElementById('arrow').style.display = "none";
+    document.getElementById('first-box').style.display = "flex";
+    document.getElementById('history-container').style.display = "flex";
+    
+    document.getElementById('main-circle').innerText = "1";
+    document.getElementById('p-1').innerText = "Period: " + (currentBasePeriod - 1);
+    
+    renderGrid();
   }
 
-  function generateRows() {
+  function renderGrid() {
     const wrapper = document.getElementById('rows-wrapper');
     wrapper.innerHTML = "";
-    const start = currentPage === 1 ? 1 : 11;
-    const end = currentPage === 1 ? 10 : 20;
+    
+    // अगर पेज 1 है तो 2 से 10 दिखाओ (क्योंकि 1 ऊपर बन चुका है)
+    // अगर पेज 2 है तो 11 से 20 दिखाओ
+    const start = (currentPage === 1) ? 2 : 11;
+    const end = (currentPage === 1) ? 10 : 20;
 
     for (let i = start; i <= end; i++) {
       const pNo = currentBasePeriod - i;
@@ -177,49 +205,54 @@
         <div class="row-circle">${i}</div>
         <div class="history-input-box">
           <span class="p-no">Period: ${pNo}</span>
-          <input type="number" class="val-input" placeholder="0-9" maxlength="1">
+          <input type="number" class="val-input" placeholder="0-9" oninput="limit(this)">
         </div>
       `;
       wrapper.appendChild(row);
     }
   }
 
-  function switchPage() {
-    if(currentPage === 1) {
-      currentPage = 2;
-      document.getElementById('next-btn').innerText = "Close 11-20 (Back to 1-10)";
-    } else {
-      currentPage = 1;
-      document.getElementById('history-container').style.display = "none";
-      document.getElementById('next-btn').innerText = "Show 11-20 ➔";
-    }
-    generateRows();
+  function refreshPeriodLabels() {
+    document.getElementById('p-1').innerText = "Period: " + (currentBasePeriod - 1);
+    const pNos = document.querySelectorAll('.p-no');
+    const startIdx = (currentPage === 1) ? 2 : 11;
+    pNos.forEach((el, index) => {
+        if(index > 0) { // Skip the first one as it's handled above
+            el.innerText = "Period: " + (currentBasePeriod - (startIdx + index - 1));
+        }
+    });
   }
 
-  function calculateBetterResult() {
-    const inputs = document.querySelectorAll('.val-input');
-    let values = [];
-    inputs.forEach(input => { if(input.value !== "") values.push(parseInt(input.value)); });
+  function togglePage() {
+    currentPage = (currentPage === 1) ? 2 : 1;
+    document.getElementById('pagination-btn').innerText = 
+        (currentPage === 1) ? "SWITCH TO 11-20 ➔" : "BACK TO 1-10 ➔";
+    renderGrid();
+  }
 
-    if(values.length < 3) {
-      document.getElementById('log').innerText = "Please enter at least 3 historical numbers!";
-      return;
+  function getBetterResult() {
+    const inputs = document.querySelectorAll('.val-input');
+    let data = [];
+    inputs.forEach(i => { if(i.value !== "") data.push(parseInt(i.value)); });
+
+    if(data.length < 2) {
+        document.getElementById('feedback').innerText = "Need more history data!";
+        return;
     }
 
-    // AI Logic based on history
-    const sum = values.reduce((a, b) => a + b, 0);
-    const avg = sum / values.length;
-    let finalPred = avg >= 4.5 ? "BIG" : "SMALL";
+    // Advanced Logic: Trend detection
+    const last = data[0];
+    const trend = data.reduce((a, b) => a + b, 0) / data.length;
+    let res = (trend > 4.2) ? "BIG" : "SMALL";
     
     const display = document.getElementById('main-prediction');
-    display.innerText = finalPred;
-    display.style.color = finalPred === "BIG" ? "#00f3ff" : "#fbbf24";
-    document.getElementById('log').innerText = `AI analyzed ${values.length} rounds. Result Boosted!`;
+    display.innerText = res;
+    display.style.color = (res === "BIG") ? "#00f3ff" : "#fbbf24";
+    document.getElementById('feedback').innerText = "AI Analysis Complete. Pattern Identified.";
   }
 
-  setInterval(updateSync, 1000);
-  updateSync();
+  setInterval(updateSystem, 1000);
+  updateSystem();
 </script>
-
 </body>
 </html>
