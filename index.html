@@ -3,43 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>मेरी पहली वेबसाइट</title>
+    <title>Super Predictor</title>
     <style>
+        /* आपके App का लुक और फील यहाँ है */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a; /* डार्क बैकग्राउंड */
+            color: white;
             margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .card {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        .header {
+            width: 100%;
+            padding: 15px;
+            background-color: #000;
+            text-align: left;
+            font-weight: bold;
+            font-style: italic;
+            border-bottom: 2px solid #333;
+        }
+        .container {
+            padding: 20px;
             text-align: center;
+            margin-top: 50px;
         }
-        h1 { color: #333; }
-        p { color: #666; }
-        button {
-            background-color: #007bff;
+        .main-button {
+            background-color: #0056b3;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
             cursor: pointer;
+            transition: 0.3s;
         }
-        button:hover { background-color: #0056b3; }
+        .main-button:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>नमस्ते दुनिया! 👋</h1>
-        <p>यह मेरी पहली HTML फाइल है जिसे मैंने Gemini की मदद से बनाया है।</p>
-        <button onclick="alert('बधाई हो! आपकी फाइल काम कर रही है।')">यहाँ क्लिक करें</button>
+    <div class="header">
+        Super Predictor
+    </div>
+
+    <div class="container">
+        <h1>स्वागत है!</h1>
+        <p>आपका App अब तैयार है।</p>
+        
+        <button class="main-button">Dashboard खोलें</button>
     </div>
 
 </body>
