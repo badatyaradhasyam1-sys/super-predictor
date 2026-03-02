@@ -3,202 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Super Predictor Pro AI</title>
+    <title>Super Predictor V4 - Perfect Sync</title>
     <style>
-        :root {
-            --neon: #00f3ff; --bg: #0b1426; --glass: rgba(255, 255, 255, 0.05);
-            --gold: #ffcc00; --purple: #bc13fe;
-        }
-        body {
-            margin: 0; background-color: var(--bg); color: white;
-            font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center;
-        }
-        .container {
-            width: 100%; max-width: 420px; min-height: 100vh; padding: 15px;
-            background: linear-gradient(180deg, #0f1c35 0%, #0b1426 100%);
-            border: 1px solid rgba(0, 243, 255, 0.1); box-sizing: border-box;
-        }
-        .header-title {
-            text-align: center; font-size: 24px; font-weight: 900;
-            color: var(--neon); text-shadow: 0 0 15px var(--neon); margin: 15px 0;
-            text-transform: uppercase; letter-spacing: 2px;
-        }
-        .status-card {
-            background: rgba(255, 255, 255, 0.03); border-radius: 15px; padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1); display: flex;
-            justify-content: space-between; align-items: center; margin-bottom: 20px;
-        }
-        .period-box { font-size: 14px; color: #94a3b8; }
-        #current-p { font-size: 18px; color: white; font-weight: bold; display: block; margin-top: 4px;}
-        #timer { font-size: 36px; color: var(--gold); font-weight: 900; }
+        :root { --neon: #00f3ff; --bg: #0b1426; --gold: #ffcc00; }
+        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 420px; padding: 15px; box-sizing: border-box; }
+        
+        .header { text-align: center; color: var(--neon); font-size: 24px; font-weight: 900; text-shadow: 0 0 10px var(--neon); margin: 20px 0; }
+        
+        .status-card { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,243,255,0.2); }
+        #timer { font-size: 32px; color: var(--gold); font-weight: bold; }
 
-        .signal-display {
-            background: rgba(0, 243, 255, 0.02); border: 2px solid var(--neon);
-            border-radius: 25px; padding: 35px 20px; text-align: center;
-            margin-bottom: 25px; box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.1);
-        }
-        #prediction-text { font-size: 42px; font-weight: 900; color: #4b5563; letter-spacing: 2px; }
+        .signal-box { border: 2px solid var(--neon); border-radius: 20px; padding: 40px 10px; text-align: center; margin: 20px 0; background: rgba(0,243,255,0.02); }
+        #prediction-text { font-size: 45px; font-weight: 900; color: #4b5563; transition: 0.3s; }
 
-        /* History Table Styles */
-        .history-list { display: flex; flex-direction: column; gap: 12px; }
-        .row {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(0, 243, 255, 0.15);
-            border-radius: 50px; padding: 8px 15px; display: flex; align-items: center; gap: 12px;
-        }
-        .circle-id {
-            min-width: 32px; height: 32px; border-radius: 50%;
-            background: var(--neon); color: black; font-weight: bold;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 12px var(--neon); cursor: pointer;
-        }
-        .period-info { flex: 1; font-size: 9px; color: #64748b; font-family: monospace; }
-        .p-val { color: var(--neon); font-size: 11px; display: block; margin-top: 2px; }
+        .row { background: rgba(255,255,255,0.03); border-radius: 50px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .circle-id { min-width: 32px; height: 32px; border-radius: 50%; background: var(--neon); color: black; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 0 10px var(--neon); cursor: pointer; }
+        .period-info { flex: 1; font-size: 10px; color: #94a3b8; line-height: 1.2; }
+        .p-val { color: var(--neon); font-weight: bold; display: block; font-size: 12px; }
 
-        /* Ball Style Input Buttons */
-        .ball-container { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; }
-        .ball-container::-webkit-scrollbar { display: none; }
-        .ball {
-            width: 26px; height: 26px; border-radius: 50%;
-            border: 1px solid rgba(0, 243, 255, 0.4); color: var(--neon);
-            font-size: 12px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.2s; font-weight: bold;
-        }
-        .ball.active {
-            background: var(--neon); color: black; border-color: white;
-            box-shadow: 0 0 10px var(--neon); transform: scale(1.1);
-        }
-
-        .btn-boost {
-            width: 100%; padding: 18px; margin-top: 25px;
-            background: linear-gradient(90deg, var(--neon), var(--purple));
-            border: none; border-radius: 15px; color: white;
-            font-weight: bold; font-size: 18px; cursor: pointer;
-            box-shadow: 0 5px 20px rgba(188, 19, 254, 0.4);
-        }
+        .ball-grid { display: flex; gap: 4px; }
+        .ball { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--neon); color: var(--neon); display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; transition: 0.2s; }
+        .ball.selected { background: var(--neon); color: black; font-weight: bold; transform: scale(1.1); box-shadow: 0 0 8px var(--neon); }
+        
+        .btn-predict { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), #bc13fe); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header-title">SUPER PREDICTOR</div>
+    <div class="header">SUPER PREDICTOR</div>
 
     <div class="status-card">
-        <div class="period-box">
-            LIVE PERIOD
-            <span id="current-p">---</span>
+        <div>
+            <div style="font-size: 10px; color: #94a3b8;">LIVE PERIOD</div>
+            <div id="live-period" style="font-size: 16px; font-weight: bold;">---</div>
         </div>
         <div id="timer">00:00</div>
     </div>
 
-    <div class="signal-display">
-        <div style="font-size: 10px; color: #94a3b8; margin-bottom: 8px; letter-spacing: 2px;">AI SIGNAL</div>
+    <div class="signal-box">
         <div id="prediction-text">WAITING DATA</div>
     </div>
 
-    <div id="history-container" class="history-list"></div>
+    <div id="history-list"></div>
 
-    <button class="btn-boost" onclick="getResult()">BETTER RESULT</button>
+    <button class="btn-predict" onclick="analyzeResult()">BETTER RESULT</button>
 </div>
 
 <script>
-    let historyData = new Array(20).fill(null);
-    let lastP = 0;
-    let isFullView = false;
+    let userInputs = new Array(20).fill(null);
+    let lastProcessedPeriod = 0;
+    let isFull = false;
     let isCollapsed = false;
 
-    function startEngine() {
-        updateTime();
-        setInterval(updateTime, 1000);
-    }
-
-    function updateTime() {
+    function coreEngine() {
         const now = new Date();
-        const hrs = now.getUTCHours();
-        const mins = now.getUTCMinutes();
-        const secs = now.getUTCSeconds();
-
-        const datePart = now.getUTCFullYear().toString() + 
-                         (now.getUTCMonth()+1).toString().padStart(2,'0') + 
-                         now.getUTCDate().toString().padStart(2,'0');
+        const seconds = now.getUTCSeconds();
         
-        // Exact period calculation
-        const currentLiveP = parseInt(datePart + "1000" + (10001 + (hrs * 60 + mins)));
+        // WinGo 30sec Logic (0-29s and 30-59s are 2 periods)
+        const total30SecIntervals = Math.floor((now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + seconds) / 30);
         
-        document.getElementById('current-p').innerText = currentLiveP;
-        document.getElementById('timer').innerText = "00:" + (59 - secs).toString().padStart(2,'0');
+        const dateStr = now.getUTCFullYear().toString() + 
+                        (now.getUTCMonth() + 1).toString().padStart(2, '0') + 
+                        now.getUTCDate().toString().padStart(2, '0');
+        
+        const currentLiveP = dateStr + "1000" + (10001 + total30SecIntervals);
+        
+        // Update UI
+        document.getElementById('live-period').innerText = currentLiveP;
+        
+        // Timer display (seconds remaining in current 30s block)
+        const remaining = 30 - (seconds % 30);
+        document.getElementById('timer').innerText = "00:" + remaining.toString().padStart(2, '0');
 
-        // Logic: Shift data when period changes
-        if (lastP !== 0 && currentLiveP > lastP) {
+        // Shifting Logic: When period actually changes
+        const currentPNum = parseInt(currentLiveP);
+        if (lastProcessedPeriod !== 0 && currentPNum > lastProcessedPeriod) {
+            // Shift inputs down
             for (let i = 19; i > 0; i--) {
-                historyData[i] = historyData[i-1];
+                userInputs[i] = userInputs[i - 1];
             }
-            historyData[0] = null; // New empty slot for Row 1
+            userInputs[0] = null; // Clear Row 1 for new period
         }
         
-        lastP = currentLiveP;
-        renderHistory();
+        lastProcessedPeriod = currentPNum;
+        renderRows();
     }
 
-    function renderHistory() {
-        const container = document.getElementById('history-container');
-        container.innerHTML = "";
+    function renderRows() {
+        const list = document.getElementById('history-list');
+        list.innerHTML = "";
         
-        // Show 1 (collapsed), 10 (standard), or 20 (full)
-        let count = isCollapsed ? 1 : (isFullView ? 20 : 10);
+        let limit = isCollapsed ? 1 : (isFull ? 20 : 10);
 
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < limit; i++) {
+            const rowP = lastProcessedPeriod - (i + 1);
             const row = document.createElement('div');
             row.className = 'row';
             
-            let ballHTML = '';
+            let balls = '';
             for(let n=0; n<=9; n++) {
-                const activeClass = historyData[i] === n ? 'active' : '';
-                ballHTML += `<div class="ball ${activeClass}" onclick="selectNum(${i}, ${n})">${n}</div>`;
+                const sel = userInputs[i] === n ? 'selected' : '';
+                balls += `<div class="ball ${sel}" onclick="setVal(${i}, ${n})">${n}</div>`;
             }
 
-            // CRITICAL FIX: Step-down periods (10350 -> 10349 -> 10348)
-            const rowP = lastP - (i + 1);
-
             row.innerHTML = `
-                <div class="circle-id" onclick="toggleRows(${i})">${i + 1}</div>
-                <div class="period-info">PERIOD: <span class="p-val">${rowP}</span></div>
-                <div class="ball-container">${ballHTML}</div>
+                <div class="circle-id" onclick="toggleView(${i})">${i + 1}</div>
+                <div class="period-info">PERIOD:<span class="p-val">${rowP}</span></div>
+                <div class="ball-grid">${balls}</div>
             `;
-            container.appendChild(row);
+            list.appendChild(row);
         }
     }
 
-    function selectNum(idx, val) {
-        historyData[idx] = val;
-        renderHistory();
-    }
+    function setVal(idx, val) { userInputs[idx] = val; renderRows(); }
 
-    function toggleRows(idx) {
+    function toggleView(idx) {
         if(idx === 0) isCollapsed = !isCollapsed;
-        if(idx === 9) isFullView = !isFullView;
-        renderHistory();
+        if(idx === 9) isFull = !isFull;
+        renderRows();
     }
 
-    function getResult() {
-        const valid = historyData.filter(v => v !== null);
-        if(valid.length < 3) {
-            alert("Please input at least 3 historical numbers!");
-            return;
-        }
-
-        const avg = valid.reduce((a, b) => a + b, 0) / valid.length;
+    function analyzeResult() {
+        const active = userInputs.filter(v => v !== null);
+        if(active.length < 3) return alert("Please input at least 3 historical numbers!");
+        
+        const avg = active.reduce((a, b) => a + b, 0) / active.length;
         const res = avg >= 4.5 ? "BIG" : "SMALL";
         
         const txt = document.getElementById('prediction-text');
         txt.innerText = res;
         txt.style.color = res === "BIG" ? "var(--neon)" : "var(--gold)";
-        txt.style.textShadow = `0 0 20px ${res === "BIG" ? 'var(--neon)' : 'var(--gold)'}`;
+        txt.style.textShadow = "0 0 20px " + (res === "BIG" ? "cyan" : "gold");
         
         isCollapsed = true;
-        renderHistory();
+        renderRows();
     }
 
-    startEngine();
+    setInterval(coreEngine, 1000);
+    coreEngine();
 </script>
 </body>
 </html>
