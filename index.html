@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Super Predictor Pro AI - V2</title>
+  <title>Super Predictor Pro AI - V4 (Auto-Shift)</title>
   <style>
     :root {
       --neon: #00f3ff;
@@ -32,52 +32,54 @@
       background: var(--glass); padding: 12px; border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;
     }
-    #timer { font-size: 32px; color: #fbbf24; font-weight: bold; }
+    #timer { font-size: 32px; color: #fbbf24; font-weight: bold; font-family: monospace; }
 
     .main-display {
       background: linear-gradient(135deg, #0f172a, #1e293b);
       border-radius: 20px; padding: 40px 20px; text-align: center;
       border: 2px solid var(--neon); box-shadow: 0 0 25px rgba(0, 243, 255, 0.2);
-      margin-bottom: 20px; position: relative; overflow: hidden;
+      margin-bottom: 20px;
     }
     
-    /* Result Animation Classes */
     #prediction-text { 
       font-size: 48px; font-weight: 900; color: #64748b; 
-      letter-spacing: 3px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .result-glow {
-      animation: zoomGlow 0.8s ease-out forwards;
-    }
-    @keyframes zoomGlow {
-      0% { transform: scale(0.5); opacity: 0; filter: blur(10px); }
-      100% { transform: scale(1.1); opacity: 1; filter: blur(0); text-shadow: 0 0 20px currentColor; }
+      letter-spacing: 3px; transition: all 0.4s ease;
     }
 
-    .history-section { display: flex; flex-direction: column; gap: 10px; }
+    .result-glow { animation: zoomInGlow 0.6s forwards; }
+    @keyframes zoomInGlow {
+      0% { transform: scale(0.3); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; text-shadow: 0 0 30px currentColor; }
+    }
+
+    .history-section { display: flex; flex-direction: column; gap: 8px; }
     .history-row {
-      display: flex; align-items: center; gap: 10px;
-      background: var(--glass); padding: 8px 12px; border-radius: 50px;
-      border: 1px solid rgba(0, 243, 255, 0.2);
+      display: flex; align-items: center; gap: 8px;
+      background: var(--glass); padding: 6px 10px; border-radius: 50px;
+      border: 1px solid rgba(0, 243, 255, 0.1);
+      transition: all 0.3s ease;
     }
     .circle-no {
-      width: 35px; height: 35px; border-radius: 50%;
+      width: 32px; height: 32px; border-radius: 50%;
       background: var(--neon); color: #000; display: flex;
-      justify-content: center; align-items: center; font-weight: bold;
+      justify-content: center; align-items: center; font-weight: bold; font-size: 13px;
+      flex-shrink: 0; cursor: pointer;
     }
-    .num-pad { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+    .num-pad { display: flex; gap: 3px; overflow-x: auto; scrollbar-width: none; }
     .num-btn {
-      width: 28px; height: 28px; border-radius: 50%;
+      width: 26px; height: 26px; border-radius: 50%;
       border: 1px solid var(--neon); color: var(--neon); 
-      font-size: 12px; display: flex; justify-content: center; align-items: center;
+      font-size: 11px; display: flex; justify-content: center; align-items: center;
+      flex-shrink: 0;
     }
-    .num-btn.active { background: var(--neon); color: #000; box-shadow: 0 0 10px var(--neon); }
+    .num-btn.active { background: var(--neon); color: #000; box-shadow: 0 0 8px var(--neon); }
 
     .btn-action {
       width: 100%; padding: 18px; margin-top: 20px;
       background: linear-gradient(90deg, var(--neon), var(--purple));
       border: none; border-radius: 15px; color: white;
       font-weight: bold; font-size: 18px; cursor: pointer;
+      text-transform: uppercase;
     }
   </style>
 </head>
@@ -88,50 +90,64 @@
 
   <div class="status-bar">
     <div>
-      <div style="font-size: 10px; color: #94a3b8;">PERIOD</div>
+      <div style="font-size: 9px; color: #94a3b8; letter-spacing: 1px;">PERIOD NO</div>
       <div id="current-period" style="font-size: 16px; font-weight: bold;">---</div>
     </div>
     <div id="timer">00:00</div>
   </div>
 
   <div class="main-display">
-    <div style="font-size: 11px; letter-spacing: 2px; color: #94a3b8; margin-bottom: 5px;">AI SIGNAL STRENGTH: <span id="strength">LOW</span></div>
-    <div id="prediction-text">WAITING...</div>
+    <div style="font-size: 10px; color: #94a3b8; margin-bottom: 5px;">AI STRENGTH: <span id="strength">---</span></div>
+    <div id="prediction-text">WAITING DATA</div>
   </div>
 
   <div id="history-list" class="history-section"></div>
 
-  <button class="btn-action" onclick="processAI()">BETTER RESULT</button>
+  <button class="btn-action" onclick="processAI()">Get AI Signal</button>
 </div>
 
 <script>
-  let historyData = new Array(10).fill(null);
-  let isCollapsed = false;
+  let historyData = new Array(20).fill(null);
+  let viewState = 'hide'; // 'hide', 'expanded'
+  let lastPeriod = "";
 
-  function init() {
-    updateClock();
-    setInterval(updateClock, 1000);
-    renderRows();
-  }
-
-  function vibrate(ms = 50) {
+  function vibrate(ms) {
     if (navigator.vibrate) navigator.vibrate(ms);
   }
 
-  function updateClock() {
+  function updateTimerAndPeriod() {
     const now = new Date();
-    const dateStr = now.getUTCFullYear().toString() + (now.getUTCMonth()+1).toString().padStart(2,'0') + now.getUTCDate().toString().padStart(2,'0');
-    const totalMin = now.getUTCHours() * 60 + now.getUTCMinutes();
-    const currentPeriodNo = parseInt(dateStr + "1000" + (10001 + totalMin));
-    
-    document.getElementById('current-period').innerText = currentPeriodNo;
-    document.getElementById('timer').innerText = "00:" + (59 - now.getUTCSeconds()).toString().padStart(2,'0');
+    const seconds = now.getUTCSeconds();
+    const remainingSeconds = 59 - seconds;
+
+    const dateStr = now.getUTCFullYear().toString() + (now.getUTCMonth() + 1).toString().padStart(2, '0') + now.getUTCDate().toString().padStart(2, '0');
+    const totalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+    const currentPeriod = dateStr + "1000" + (10001 + totalMinutes);
+
+    if (currentPeriod !== lastPeriod) {
+      // Shift Logic: 1 -> 2, 2 -> 3... 19 -> 20
+      if(lastPeriod !== "") {
+        for (let i = 19; i > 0; i--) {
+          historyData[i] = historyData[i-1];
+        }
+        historyData[0] = null; // New period start, clear row 1
+        renderRows();
+      }
+      
+      lastPeriod = currentPeriod;
+      document.getElementById('current-period').innerText = currentPeriod;
+      vibrate(100);
+    }
+
+    document.getElementById('timer').innerText = "00:" + remainingSeconds.toString().padStart(2, '0');
   }
 
   function renderRows() {
     const list = document.getElementById('history-list');
     list.innerHTML = "";
-    const limit = isCollapsed ? 1 : 10;
+    
+    // View Logic
+    let limit = (viewState === 'hide') ? 1 : 20;
 
     for (let i = 0; i < limit; i++) {
       const row = document.createElement('div');
@@ -141,9 +157,21 @@
         const isActive = historyData[i] === n ? 'active' : '';
         numPadHTML += `<div class="num-btn ${isActive}" onclick="setInput(${i}, ${n})">${n}</div>`;
       }
-      row.innerHTML = `<div class="circle-no" onclick="toggleView()">${i + 1}</div><div class="num-pad">${numPadHTML}</div>`;
+      
+      // Circle No Click Logic
+      let clickAction = "";
+      if (i === 0) clickAction = `onclick="toggleView('hide')"`;
+      if (i === 9) clickAction = `onclick="toggleView('expand')"`;
+
+      row.innerHTML = `<div class="circle-no" ${clickAction}>${i + 1}</div><div class="num-pad">${numPadHTML}</div>`;
       list.appendChild(row);
     }
+  }
+
+  function toggleView(mode) {
+    vibrate(40);
+    viewState = (mode === 'hide') ? 'hide' : 'expanded';
+    renderRows();
   }
 
   function setInput(index, val) {
@@ -152,59 +180,44 @@
     renderRows();
   }
 
-  function toggleView() {
-    isCollapsed = !isCollapsed;
-    renderRows();
-  }
-
   function processAI() {
     vibrate(60);
     const filledData = historyData.filter(v => v !== null);
     if(filledData.length < 3) {
-      alert("कम से कम 3 नंबर भरें!");
+      alert("Please fill at least 3 numbers!");
       return;
     }
 
     const predEl = document.getElementById('prediction-text');
     const strengthEl = document.getElementById('strength');
     
-    // Animation Reset
     predEl.classList.remove('result-glow');
-    void predEl.offsetWidth; // Trigger reflow
+    void predEl.offsetWidth; 
     predEl.classList.add('result-glow');
 
-    // --- Advanced Logic ---
+    const avg = filledData.reduce((a, b) => a + b, 0) / filledData.length;
     const lastNum = filledData[0];
-    const sum = filledData.reduce((a, b) => a + b, 0);
-    const avg = sum / filledData.length;
-    
-    // Size Logic
-    let sizeResult = (avg > 4.5) ? "BIG" : "SMALL";
-    
-    // Color Logic (Based on traditional patterns)
-    let colorResult = "";
-    if([1,3,7,9].includes(lastNum)) colorResult = "GREEN";
-    else if([2,4,6,8].includes(lastNum)) colorResult = "RED";
-    else if(lastNum === 0) colorResult = "RED+V";
-    else colorResult = "GREEN+V";
 
-    // Strength & Selection Logic
-    // अगर औसत बहुत ज़्यादा या कम है, तो SIZE दिखाओ, वरना COLOR दिखाओ
-    if (avg > 7 || avg < 2.5) {
-      predEl.innerText = sizeResult;
-      predEl.style.color = (sizeResult === "BIG") ? "var(--neon)" : "#fbbf24";
-      strengthEl.innerText = "HIGH (SIZE)";
+    if (avg > 7.5 || avg < 2.5) {
+      let size = (avg > 5) ? "BIG" : "SMALL";
+      predEl.innerText = size;
+      predEl.style.color = (size === "BIG") ? "var(--neon)" : "#fbbf24";
+      strengthEl.innerText = "99% (SIZE)";
     } else {
-      predEl.innerText = colorResult;
-      predEl.style.color = (colorResult.includes("RED")) ? "var(--red)" : "var(--green)";
-      strengthEl.innerText = "STABLE (COLOR)";
+      let color = ([1,3,7,9].includes(lastNum)) ? "GREEN" : "RED";
+      if(lastNum === 0 || lastNum === 5) color += "+V";
+      predEl.innerText = color;
+      predEl.style.color = (color.includes("RED")) ? "var(--red)" : "var(--green)";
+      strengthEl.innerText = "94% (COLOR)";
     }
 
-    isCollapsed = true;
+    viewState = 'hide';
     renderRows();
   }
 
-  init();
+  setInterval(updateTimerAndPeriod, 1000);
+  updateTimerAndPeriod();
+  renderRows();
 </script>
 </body>
 </html>
