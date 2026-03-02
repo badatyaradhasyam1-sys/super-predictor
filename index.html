@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Super Predictor AI - Final Stable</title>
+    <title>Jalwa Predictor Pro - UTC Fixed</title>
     <style>
         :root {
             --bg: #0b1426; --neon: #00f3ff; --gold: #ffcc00;
@@ -28,65 +28,65 @@
             border-radius: 15px; padding: 12px; display: flex; justify-content: space-between;
             align-items: center; margin-bottom: 15px;
         }
-        #timer { font-size: 34px; color: var(--gold); font-weight: 900; }
+        #timer { font-size: 34px; color: var(--gold); font-weight: 900; font-family: monospace; }
+        .p-label { font-size: 10px; color: #94a3b8; letter-spacing: 1px; }
 
-        /* Prediction Area */
+        /* Prediction Box */
         .ai-box {
             position: relative; border: 2px solid var(--neon); border-radius: 20px; 
             padding: 25px 10px; text-align: center; margin-bottom: 20px; 
             background: rgba(0,243,255,0.02); overflow: hidden;
         }
+        #pred-txt { font-size: 38px; font-weight: 900; color: #4b5563; }
         .scan-line {
             position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: var(--neon); box-shadow: 0 0 15px var(--neon);
-            display: none; animation: scan 1.2s linear infinite;
+            background: var(--neon); display: none; animation: scan 1.2s linear infinite;
         }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-        #pred-txt { font-size: 38px; font-weight: 900; color: #4b5563; }
 
-        /* History List */
-        .history-list { display: flex; flex-direction: column; gap: 8px; }
+        /* History Table */
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
         .row {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 50px; padding: 5px 10px; display: flex; align-items: center; gap: 8px;
-            transition: 0.3s;
+            border-radius: 50px; padding: 6px 12px; display: flex; align-items: center; gap: 10px;
         }
         .row-id {
-            min-width: 28px; height: 28px; border-radius: 50%;
+            min-width: 30px; height: 30px; border-radius: 50%;
             background: var(--neon); color: black; font-weight: bold;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 13px;
         }
-        .p-num { color: var(--neon); font-weight: bold; font-size: 11px; font-family: monospace; }
+        .p-num { color: var(--neon); font-weight: bold; font-size: 12px; font-family: monospace; }
 
-        /* Real Ball Design */
-        .ball-box { display: flex; gap: 3px; }
+        /* Ball Colors */
+        .ball-box { display: flex; gap: 4px; }
         .ball {
-            width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
-            font-size: 10px; display: flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+            font-size: 11px; display: flex; align-items: center; justify-content: center;
             cursor: pointer; font-weight: bold; color: white; background: #1a263f;
         }
-        .ball.b-0 { border-color: #9b59b6; } .ball.b-5 { border-color: #2ecc71; }
-        .ball.red { border-color: var(--red); } .ball.green { border-color: var(--green); }
-        
-        .ball.selected { transform: scale(1.15); border-width: 2px; box-shadow: 0 0 8px white; }
+        .ball.b-red { border-color: var(--red); }
+        .ball.b-green { border-color: var(--green); }
+        .ball.b-0 { border-color: var(--purple); }
+        .ball.b-5 { border-color: #2ecc71; }
+
+        .ball.selected { transform: scale(1.2); box-shadow: 0 0 10px white; border-width: 2px; }
         .ball.sel-red { background: var(--red); }
         .ball.sel-green { background: var(--green); }
-        .ball.sel-mixed { background: linear-gradient(45deg, var(--red) 50%, var(--purple) 50%); }
-        .ball.sel-mixed-g { background: linear-gradient(45deg, var(--green) 50%, var(--purple) 50%); }
+        .ball.sel-0 { background: linear-gradient(45deg, var(--red) 50%, var(--purple) 50%); }
+        .ball.sel-5 { background: linear-gradient(45deg, var(--green) 50%, var(--purple) 50%); }
 
         .btn-action {
-            width: 100%; padding: 16px; margin-top: 20px;
+            width: 100%; padding: 18px; margin-top: 20px;
             background: linear-gradient(90deg, var(--neon), #bc13fe);
-            border: none; border-radius: 12px; color: white;
-            font-weight: bold; font-size: 16px; cursor: pointer;
+            border: none; border-radius: 15px; color: white;
+            font-weight: bold; font-size: 18px; cursor: pointer; text-transform: uppercase;
         }
         #toast {
-            position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%);
-            background: var(--neon); color: black; padding: 10px 20px;
-            border-radius: 50px; font-weight: bold; transition: 0.4s; z-index: 100;
+            position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%);
+            background: var(--neon); color: black; padding: 10px 25px;
+            border-radius: 50px; font-weight: bold; transition: 0.5s; z-index: 1000;
         }
-        #toast.show { bottom: 20px; }
+        #toast.show { bottom: 30px; }
     </style>
 </head>
 <body>
@@ -98,15 +98,15 @@
 
     <div class="status-card">
         <div>
-            <span style="font-size: 9px; color: #94a3b8;">LIVE PERIOD</span>
-            <span id="live-p" style="display:block; font-weight:bold;">---</span>
+            <span class="p-label">LIVE PERIOD (UTC SYNC)</span>
+            <span id="live-p" style="display:block; font-weight:bold; font-size:16px;">---</span>
         </div>
         <div id="timer">00:00</div>
     </div>
 
-    <div class="ai-box" id="ai-box">
+    <div class="ai-box">
         <div class="scan-line" id="scan-line"></div>
-        <div id="pred-txt">AI READY</div>
+        <div id="pred-txt">READY</div>
     </div>
 
     <div id="list-container" class="history-list"></div>
@@ -115,74 +115,82 @@
 </div>
 
 <script>
-    // LocalStorage से डेटा उठाना (अगर है तो)
-    let inputStore = JSON.parse(localStorage.getItem('wingo_data')) || new Array(20).fill(null);
+    // LocalStorage Memory
+    let inputStore = JSON.parse(localStorage.getItem('jalwa_pro_data')) || new Array(20).fill(null);
     let currentLivePeriod = 0;
-    let expanded = false;
 
     function init() {
-        refresh();
-        setInterval(refresh, 1000);
+        updateClock();
+        setInterval(updateClock, 1000);
     }
 
-    function refresh() {
+    function updateClock() {
         const now = new Date();
-        const minsTotal = now.getUTCHours() * 60 + now.getUTCMinutes();
-        const secs = now.getUTCSeconds();
-
-        const dateStr = now.getUTCFullYear().toString() + 
-                        (now.getUTCMonth()+1).toString().padStart(2,'0') + 
-                        now.getUTCDate().toString().padStart(2,'0');
         
-        const newPeriod = parseInt(dateStr + "1000" + (10001 + minsTotal));
+        // **UTC SYNC LOGIC (Jalwa Game standard)**
+        const utcHours = now.getUTCHours();
+        const utcMins = now.getUTCMinutes();
+        const utcSecs = now.getUTCSeconds();
         
-        document.getElementById('timer').innerText = "00:" + (59 - secs).toString().padStart(2,'0');
+        const totalUtcMins = (utcHours * 60) + utcMins;
+        
+        // Period Calculation: Date + 1000 + (10001 + total UTC minutes)
+        const datePart = now.getUTCFullYear().toString() + 
+                         (now.getUTCMonth()+1).toString().padStart(2,'0') + 
+                         now.getUTCDate().toString().padStart(2,'0');
+        
+        const newPeriod = parseInt(datePart + "1000" + (10001 + totalUtcMins));
+        
+        // 1 Min Countdown (60 to 0)
+        const timeLeft = 59 - utcSecs;
+        document.getElementById('timer').innerText = "00:" + timeLeft.toString().padStart(2,'0');
         document.getElementById('live-p').innerText = newPeriod;
 
-        // **CRITICAL HISTORY SHIFT LOGIC**
+        // **AUTO-SHIFTING HISTORY**
         if (currentLivePeriod !== 0 && newPeriod > currentLivePeriod) {
-            // डेटा को एक कदम नीचे खिसकाओ
             for (let i = 19; i > 0; i--) {
                 inputStore[i] = inputStore[i-1];
             }
-            inputStore[0] = null; // नया पीरियड आया, पहला बॉक्स खाली
+            inputStore[0] = null; // New top slot
             saveData();
             showToast("DATA SHIFTED ✓");
         }
 
         currentLivePeriod = newPeriod;
-        renderRows();
+        renderHistory();
     }
 
-    function renderRows() {
+    function renderHistory() {
         const container = document.getElementById('list-container');
         container.innerHTML = "";
-        let limit = expanded ? 20 : 10;
 
-        for (let i = 0; i < limit; i++) {
+        for (let i = 0; i < 10; i++) {
             const row = document.createElement('div');
             row.className = 'row';
+            
+            // History Period = Live Period - (i + 1)
+            // Example: If Live is 10444, Row 1 is 10443
             const rowP = currentLivePeriod - (i + 1);
             
             let balls = '';
             for(let n=0; n<=9; n++) {
-                let colorClass = (n % 2 === 0) ? 'red' : 'green';
-                if(n === 0 || n === 5) colorClass = (n === 0) ? 'b-0' : 'b-5';
+                let colorClass = (n % 2 === 0) ? 'b-red' : 'b-green';
+                if(n === 0) colorClass = 'b-0';
+                if(n === 5) colorClass = 'b-5';
                 
                 let selClass = "";
                 if(inputStore[i] === n) {
                     selClass = "selected ";
-                    if(n === 0) selClass += "sel-mixed";
-                    else if(n === 5) selClass += "sel-mixed-g";
+                    if(n === 0) selClass += "sel-0";
+                    else if(n === 5) selClass += "sel-5";
                     else selClass += (n % 2 === 0) ? "sel-red" : "sel-green";
                 }
                 balls += `<div class="ball ${colorClass} ${selClass}" onclick="setVal(${i}, ${n})">${n}</div>`;
             }
 
-            const idStyle = (i === 9) ? "background:#bc13fe; color:white;" : "";
             row.innerHTML = `
-                <div class="row-id" style="${idStyle}" onclick="handleToggle(${i})">${i + 1}</div>
-                <div style="flex:1; font-size:10px;"><span class="p-num">${rowP}</span></div>
+                <div class="row-id">${i + 1}</div>
+                <div style="flex:1"><span class="p-num">${rowP}</span></div>
                 <div class="ball-box">${balls}</div>
             `;
             container.appendChild(row);
@@ -192,16 +200,11 @@
     function setVal(idx, val) {
         inputStore[idx] = val;
         saveData();
-        renderRows();
+        renderHistory();
     }
 
     function saveData() {
-        localStorage.setItem('wingo_data', JSON.stringify(inputStore));
-    }
-
-    function handleToggle(idx) {
-        if(idx === 9) expanded = !expanded;
-        renderRows();
+        localStorage.setItem('jalwa_pro_data', JSON.stringify(inputStore));
     }
 
     function showToast(msg) {
@@ -213,13 +216,12 @@
 
     function runAI() {
         const data = inputStore.filter(v => v !== null);
-        if(data.length < 3) return alert("Please fill at least 3 history inputs!");
+        if(data.length < 3) return alert("कम से कम 3 हिस्ट्री भरें!");
 
         const predTxt = document.getElementById('pred-txt');
         const scanLine = document.getElementById('scan-line');
-
+        
         predTxt.innerText = "SCANNING...";
-        predTxt.style.color = "var(--gold)";
         scanLine.style.display = "block";
 
         setTimeout(() => {
@@ -229,7 +231,6 @@
             predTxt.innerText = res;
             predTxt.style.color = (res === "BIG") ? "var(--neon)" : "var(--gold)";
             predTxt.style.textShadow = `0 0 20px ${(res === "BIG") ? 'cyan' : 'orange'}`;
-            showToast("ANALYSIS COMPLETE ✓");
         }, 1500);
     }
 
