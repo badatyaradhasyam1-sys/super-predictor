@@ -2,263 +2,302 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Elite Predictor V5 - Neon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elite Predictor V4</title>
   <style>
     :root {
-      --neon-blue: #00f3ff;
-      --neon-red: #ff0055;
+      --neon-red: #ff3131;
       --neon-green: #39ff14;
       --neon-purple: #bc13fe;
+      --neon-blue: #00d9ff;
     }
 
     body {
       margin: 0;
-      background: #050a18;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #020617;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
       justify-content: center;
       color: white;
+      overflow-x: hidden;
     }
 
-    /* मुख्य कंटेनर और चमकीली लाइट */
+    /* चमकीले लाइट का डेकोरेशन */
     .container {
       width: 100%;
       max-width: 420px;
-      min-height: 100vh;
       background: #0f172a;
+      min-height: 100vh;
       padding: 20px;
       box-sizing: border-box;
-      border: 2px solid var(--neon-blue);
-      box-shadow: 0 0 15px var(--neon-blue);
+      border: 1px solid #1e293b;
+      box-shadow: 0 0 20px var(--neon-blue);
       position: relative;
     }
 
-    .neon-line {
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
-      margin: 10px 0;
+    .neon-border {
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--neon-red), var(--neon-green), var(--neon-purple));
+      animation: glow 2s linear infinite;
+    }
+
+    @keyframes glow {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
     }
 
     h2 {
       text-align: center;
-      color: var(--neon-blue);
-      text-shadow: 0 0 10px var(--neon-blue);
+      font-size: 26px;
       text-transform: uppercase;
-      margin: 10px 0;
+      text-shadow: 0 0 10px var(--neon-blue);
+      margin: 20px 0;
     }
 
-    /* पीरियड और टाइमर सेक्शन */
-    .info-box {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
+    /* Period & Timer Box */
+    .timer-section {
+      background: rgba(30, 41, 59, 0.7);
+      border-radius: 15px;
       padding: 15px;
       text-align: center;
-      border: 1px solid rgba(0, 243, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
     }
 
-    #period-id { font-size: 18px; color: #94a3b8; font-weight: bold; }
-    #timer { font-size: 38px; font-weight: 900; color: #fbbf24; font-family: monospace; }
+    #period-no {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--neon-blue);
+    }
 
-    /* प्रेडिक्शन कार्ड */
-    .prediction-card {
+    #timer {
+      font-size: 40px;
+      font-weight: 900;
+      font-family: 'Courier New', monospace;
+      color: #fbbf24;
+    }
+
+    /* Prediction Box */
+    .prediction-box {
       background: linear-gradient(145deg, #1e293b, #0f172a);
       border-radius: 20px;
-      padding: 30px 10px;
+      padding: 40px 20px;
       text-align: center;
-      margin: 20px 0;
+      margin-bottom: 20px;
       border: 2px solid #334155;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
     }
 
     #main-result {
-      font-size: 52px;
+      font-size: 55px;
       font-weight: 900;
-      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+      letter-spacing: 2px;
     }
 
-    /* इनपुट सेक्शन */
-    .input-group {
+    /* Stats */
+    .stats-row {
       display: flex;
       gap: 10px;
-      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      flex: 1;
+      background: #1e293b;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    /* Input Area */
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
     }
 
     input {
       flex: 1;
       padding: 15px;
       border-radius: 10px;
-      border: 1px solid var(--neon-blue);
-      background: #050a18;
+      border: 1px solid #334155;
+      background: #020617;
       color: white;
       font-size: 20px;
       text-align: center;
     }
 
     button {
-      padding: 15px 20px;
-      background: var(--neon-blue);
-      border: none;
+      padding: 15px 25px;
       border-radius: 10px;
+      border: none;
       font-weight: bold;
       cursor: pointer;
+      background: var(--neon-blue);
+      color: #000;
     }
 
-    /* हिस्ट्री टेबल */
-    table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 13px; }
-    th { color: #64748b; padding: 10px; border-bottom: 1px solid #334155; }
+    /* History Table */
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th { padding: 10px; border-bottom: 2px solid #334155; color: #94a3b8; }
     td { padding: 10px; text-align: center; border-bottom: 1px solid #1e293b; }
-    .win { color: var(--neon-green); font-weight: bold; }
-    .loss { color: var(--neon-red); font-weight: bold; }
+
+    .win-text { color: var(--neon-green); font-weight: bold; }
+    .loss-text { color: var(--neon-red); font-weight: bold; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>⚡ WINGO ELITE ⚡</h2>
-  <div class="neon-line"></div>
+  <div class="neon-border"></div>
+  <h2>Wingo AI Predictor</h2>
 
-  <div class="info-box">
-    <div id="period-id">PERIOD: LOADING...</div>
+  <div class="timer-section">
+    <div id="period-no">PERIOD: LOADING...</div>
     <div id="timer">00:59</div>
   </div>
 
-  <div class="prediction-card">
-    <div style="font-size: 11px; color: #94a3b8; margin-bottom: 5px;">AI PREDICTION</div>
+  <div class="prediction-box">
+    <div style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">ANALYZED RESULT</div>
     <div id="main-result">---</div>
-    <div id="type-label" style="font-size: 14px; margin-top: 5px;">Wait for sync...</div>
+    <div id="prob-type" style="font-size: 14px; color: #64748b; margin-top: 10px;">AI Scanning...</div>
   </div>
 
-  <div style="display:flex; justify-content:space-between; padding:0 10px;">
-    <span>Wins: <b id="win-count" style="color:var(--neon-green)">0</b></span>
-    <span>Accuracy: <b id="acc-percent">0%</b></span>
-    <span>Loss: <b id="loss-count" style="color:var(--neon-red)">0</b></span>
+  <div class="stats-row">
+    <div class="stat-item"><div id="wins">0</div><div style="font-size: 10px;">WINS</div></div>
+    <div class="stat-item"><div id="losses">0</div><div style="font-size: 10px;">LOSSES</div></div>
+    <div class="stat-item"><div id="acc">0%</div><div style="font-size: 10px;">ACCURACY</div></div>
   </div>
 
-  <div class="input-group">
-    <input type="number" id="user-input" placeholder="Enter Result (0-9)" min="0" max="9">
-    <button onclick="submitResult()">UPDATE</button>
+  <div style="text-align: center; margin-bottom: 10px; font-weight: bold;" id="feedback"></div>
+
+  <div class="input-row">
+    <input type="number" id="actual-num" placeholder="Enter No (0-9)" min="0" max="9">
+    <button onclick="checkPerformance()">SUBMIT</button>
   </div>
 
-  <table id="history-table">
+  <table id="history">
     <thead>
       <tr>
         <th>Period</th>
-        <th>Number</th>
+        <th>Input</th>
         <th>Result</th>
       </tr>
     </thead>
     <tbody id="history-body"></tbody>
   </table>
-
-  <p style="font-size: 10px; color: #475569; text-align: center; margin-top: 20px;">
-    Real-time sync based on UTC 1-min intervals.
-  </p>
 </div>
 
 <script>
-  let win = 0, loss = 0;
-  let currentPrediction = null;
+  let pastResults = [];
+  let winCount = 0;
+  let lossCount = 0;
+  let lastPrediction = null;
 
-  // 1. समय और पीरियड सिंक (Real-time Logic)
-  function updateTime() {
+  // 1. Period & Timer Sync Logic (Real Game Time)
+  function updatePeriodAndTimer() {
     const now = new Date();
     const utcHours = now.getUTCHours();
     const utcMinutes = now.getUTCMinutes();
     const utcSeconds = now.getUTCSeconds();
 
-    // पीरियड नंबर का असली फॉर्मेट (YYYYMMDD + Total Minutes)
-    const yyyy = now.getUTCFullYear();
-    const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
-    const dd = String(now.getUTCDate()).padStart(2, '0');
-    const totalMin = utcHours * 60 + utcMinutes;
-    const periodId = `${yyyy}${mm}${dd}1000${10001 + totalMin}`;
+    // Wingo 1-min Period Logic (YYYYMMDD + Minutes of the day)
+    const yyyy = now.getUTCFullYear().toString();
+    const mm = (now.getUTCMonth() + 1).toString().padStart(2, '0');
+    const dd = now.getUTCDate().toString().padStart(2, '0');
+    const totalMinutes = utcHours * 60 + utcMinutes;
+    const periodId = yyyy + mm + dd + "1000" + (10001 + totalMinutes);
 
-    document.getElementById('period-id').textContent = "PERIOD: " + periodId;
+    document.getElementById('period-no').textContent = "PERIOD: " + periodId;
     
-    const secRemaining = 59 - utcSeconds;
-    document.getElementById('timer').textContent = "00:" + String(secRemaining).padStart(2, '0');
+    const secondsLeft = 59 - utcSeconds;
+    document.getElementById('timer').textContent = "00:" + secondsLeft.toString().padStart(2, '0');
 
-    // 59वें सेकंड पर प्रेडिक्शन बदलें
-    if (secRemaining === 59) generatePrediction();
+    // जब समय 59 हो, तब नई भविष्यवाणी करें
+    if (secondsLeft === 59) {
+      makeNewPrediction();
+    }
   }
 
-  // 2. भविष्यवाणी का लॉजिक (आपके रूल्स के आधार पर)
-  function generatePrediction() {
-    const choices = ["BIG", "SMALL", "RED", "GREEN", "VIOLET"];
-    // वायलेट कम आता है इसलिए उसकी संभावना कम रखी गई है
-    const weights = [0.35, 0.35, 0.12, 0.13, 0.05]; 
-    
-    let rand = Math.random();
-    let cumulative = 0;
-    for(let i=0; i<choices.length; i++) {
-        cumulative += weights[i];
-        if(rand < cumulative) {
-            currentPrediction = choices[i];
-            break;
-        }
+  // 2. Advanced Prediction Logic (Voting + History Analysis)
+  function makeNewPrediction() {
+    const options = ["BIG", "SMALL", "RED", "GREEN", "VIOLET"];
+    const weights = { "BIG": 20, "SMALL": 20, "RED": 20, "GREEN": 20, "VIOLET": 5 };
+
+    // अगर पुरानी हिस्ट्री है, तो पैटर्न चेक करें
+    if(pastResults.length > 3) {
+      const last3 = pastResults.slice(-3);
+      if(last3.every(n => n >= 5)) weights["SMALL"] += 30; // 3 बार Big आया तो Small के चांस बढ़ाएं
+      if(last3.every(n => n < 5)) weights["BIG"] += 30;
     }
 
-    const box = document.getElementById('main-result');
-    box.textContent = currentPrediction;
+    // सबसे ज्यादा स्कोर वाला ऑप्शन चुनें
+    const winner = Object.keys(weights).reduce((a, b) => weights[a] > weights[b] ? a : b);
+    lastPrediction = winner;
+
+    const display = document.getElementById('main-result');
+    display.textContent = winner;
     
-    // कलर्स सेट करना
-    if(currentPrediction === "BIG") box.style.color = "var(--neon-blue)";
-    if(currentPrediction === "SMALL") box.style.color = "#fbbf24";
-    if(currentPrediction === "RED") box.style.color = "var(--neon-red)";
-    if(currentPrediction === "GREEN") box.style.color = "var(--neon-green)";
-    if(currentPrediction === "VIOLET") box.style.color = "var(--neon-purple)";
+    // UI Colors
+    if(winner === "BIG") display.style.color = "#00d9ff";
+    else if(winner === "SMALL") display.style.color = "#fbbf24";
+    else if(winner === "RED") display.style.color = "#ff3131";
+    else if(winner === "GREEN") display.style.color = "#39ff14";
+    else if(winner === "VIOLET") display.style.color = "#bc13fe";
   }
 
-  // 3. Win/Loss की गणना (आपके बताए नियमों के अनुसार)
-  function submitResult() {
-    const val = parseInt(document.getElementById('user-input').value);
-    if(isNaN(val) || currentPrediction === null) return;
+  // 3. Smart Win/Loss गणना (आपके दिए उदाहरण के अनुसार)
+  function checkPerformance() {
+    const inputVal = parseInt(document.getElementById('actual-num').value);
+    const feedback = document.getElementById('feedback');
+
+    if(isNaN(inputVal) || lastPrediction === null) return;
 
     let isWin = false;
+    let isHalf = false;
 
-    // आपके द्वारा दिए गए नियमों का लॉजिक
-    if(currentPrediction === "SMALL" && val <= 4) isWin = true;
-    else if(currentPrediction === "BIG" && val >= 5) isWin = true;
-    else if(currentPrediction === "RED" && [2,4,6,8,0].includes(val)) isWin = true;
-    else if(currentPrediction === "GREEN" && [1,3,7,9,5].includes(val)) isWin = true;
-    else if(currentPrediction === "VIOLET" && [0,5].includes(val)) isWin = true;
-
-    // स्पेशल केस: 0 और 5 (Violet)
-    // अगर Green है और 5 आया, तो उसे भी जीत (Half Win/Win) माना जाता है
+    // Rules logic
+    if(lastPrediction === "SMALL" && inputVal <= 4) isWin = true;
+    else if(lastPrediction === "BIG" && inputVal >= 5) isWin = true;
+    else if(lastPrediction === "GREEN" && [1,3,7,9].includes(inputVal)) isWin = true;
+    else if(lastPrediction === "RED" && [2,4,6,8].includes(inputVal)) isWin = true;
+    else if(lastPrediction === "VIOLET" && [0,5].includes(inputVal)) isWin = true;
     
-    if(isWin) {
-      win++;
-      showFeedback("SUCCESS ✅", "var(--neon-green)");
-    } else {
-      loss++;
-      showFeedback("FAILED ❌", "var(--neon-red)");
+    // Half win/Violet logic
+    if((lastPrediction === "GREEN" || lastPrediction === "RED") && [0,5].includes(inputVal)) {
+        isHalf = true;
     }
 
-    updateStats(val, isWin);
-    document.getElementById('user-input').value = "";
-  }
+    if(isWin || isHalf) {
+      winCount++;
+      feedback.innerHTML = `<span class="win-text">SUCCESS ✅ (${isHalf ? 'VIOLET HIT' : 'WIN'})</span>`;
+    } else {
+      lossCount++;
+      feedback.innerHTML = `<span class="loss-text">FAILED ❌</span>`;
+    }
 
-  function updateStats(val, isWin) {
-    document.getElementById('win-count').textContent = win;
-    document.getElementById('loss-count').textContent = loss;
-    const total = win + loss;
-    document.getElementById('acc-percent').textContent = Math.round((win/total)*100) + "%";
-
+    // Update History
     const tbody = document.getElementById('history-body');
     const row = tbody.insertRow(0);
-    row.innerHTML = `<td>Next</td><td>${val}</td><td class="${isWin?'win':'loss'}">${isWin?'WIN':'LOSS'}</td>`;
+    row.innerHTML = `<td>Next</td><td>${inputVal}</td><td class="${isWin || isHalf ? 'win-text' : 'loss-text'}">${isWin || isHalf ? 'WIN' : 'LOSS'}</td>`;
+
+    // Stats
+    document.getElementById('wins').textContent = winCount;
+    document.getElementById('losses').textContent = lossCount;
+    document.getElementById('acc').textContent = Math.round((winCount / (winCount + lossCount)) * 100) + "%";
+
+    pastResults.push(inputVal);
+    document.getElementById('actual-num').value = "";
   }
 
-  function showFeedback(text, color) {
-    const label = document.getElementById('type-label');
-    label.textContent = text;
-    label.style.color = color;
-  }
-
-  setInterval(updateTime, 1000);
-  generatePrediction();
+  setInterval(updatePeriodAndTimer, 1000);
+  makeNewPrediction();
 </script>
 
 </body>
