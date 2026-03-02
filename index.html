@@ -33,6 +33,7 @@
     .prediction-area {
       padding: 30px; margin-bottom: 25px; border-radius: 20px;
       border: 2px solid var(--neon); text-align: center; background: #0f172a;
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
     }
     #prediction-text { font-size: 40px; font-weight: 900; color: #64748b; letter-spacing: 3px; }
 
@@ -46,17 +47,23 @@
       color: #000; display: flex; justify-content: center; align-items: center;
       font-weight: bold; cursor: pointer; box-shadow: 0 0 10px var(--neon);
     }
-    .period-info { flex: 1; font-size: 10px; color: #94a3b8; font-family: monospace; }
-    .num-pad { display: flex; gap: 4px; }
+    .special-10 { background: var(--purple) !important; color: white !important; }
+    
+    .period-info { flex: 1; font-size: 10px; color: #94a3b8; font-family: monospace; line-height: 1.2; }
+    .period-val { color: var(--neon); display: block; font-size: 11px; }
+
+    .num-pad { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
     .num-btn {
       width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--neon);
       color: var(--neon); font-size: 11px; display: flex;
       justify-content: center; align-items: center; cursor: pointer;
     }
-    .num-btn.selected { background: var(--neon); color: #000; }
+    .num-btn.selected { background: var(--neon); color: #000; box-shadow: 0 0 8px var(--neon); }
+
     .btn-action {
       width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), var(--purple));
       border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 18px; cursor: pointer;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -68,12 +75,13 @@
   <div class="status-bar">
     <div>
       <div style="font-size: 10px; color: #94a3b8;">LIVE PERIOD</div>
-      <div id="current-p" style="font-size: 16px; font-weight: bold;">---</div>
+      <div id="current-p" style="font-size: 16px; font-weight: bold; color: white;">---</div>
     </div>
     <div id="timer">00:00</div>
   </div>
 
   <div class="prediction-area">
+    <div style="font-size: 11px; color: #94a3b8; margin-bottom: 5px;">AI SIGNAL</div>
     <div id="prediction-text">WAITING DATA</div>
   </div>
 
@@ -83,8 +91,9 @@
 
 <script>
   let historyData = new Array(20).fill(null);
-  let lastPeriod = 0;
+  let lastLivePeriod = 0;
   let showFull = false;
+  let isCollapsed = false;
 
   function updateSystem() {
     const now = new Date();
@@ -92,31 +101,35 @@
     const utcMinutes = now.getUTCMinutes();
     const utcSeconds = now.getUTCSeconds();
 
-    // पीरियड बनाने का सही तरीका: YYYYMMDD + 1-min interval
+    // सटीक पीरीयड जनरेशन
     const dateStr = now.getUTCFullYear().toString() + 
                     (now.getUTCMonth()+1).toString().padStart(2,'0') + 
                     now.getUTCDate().toString().padStart(2,'0');
     
-    const currentP = parseInt(dateStr + "1000" + (10001 + (utcHours * 60 + utcMinutes)));
+    const currentLiveP = parseInt(dateStr + "1000" + (10001 + (utcHours * 60 + utcMinutes)));
     
-    document.getElementById('current-p').innerText = currentP;
+    document.getElementById('current-p').innerText = currentLiveP;
     document.getElementById('timer').innerText = "00:" + (59 - utcSeconds).toString().padStart(2,'0');
 
-    // **PERIOD FIX LOGIC:** अगर पीरियड बदल गया है, तो डेटा खिसकाएँ
-    if (lastPeriod !== 0 && currentP > lastPeriod) {
+    // **SHIFTING LOGIC:** जब लाइव पीरीयड बढ़ेगा, डेटा और पीरीयड दोनों खिसकेंगे
+    if (lastLivePeriod !== 0 && currentLiveP > lastLivePeriod) {
+        // डेटा को नीचे धकेलें
         for (let i = 19; i > 0; i--) {
             historyData[i] = historyData[i-1];
         }
-        historyData[0] = null; // सीरियल 1 को नए इनपुट के लिए खाली करें
+        historyData[0] = null; // सीरियल 1 को फ्रेश करें
     }
-    lastPeriod = currentP;
+    
+    lastLivePeriod = currentLiveP;
     render();
   }
 
   function render() {
     const list = document.getElementById('history-list');
     list.innerHTML = "";
-    let limit = showFull ? 20 : 10;
+    
+    // 1 (collapsed), 10 (default), 20 (expanded)
+    let limit = isCollapsed ? 1 : (showFull ? 20 : 10);
 
     for (let i = 0; i < limit; i++) {
       const row = document.createElement('div');
@@ -128,31 +141,49 @@
         pads += `<div class="num-btn ${selected}" onclick="setVal(${i}, ${n})">${n}</div>`;
       }
 
-      // P-1 Logic: सीरियल 1 = Live Period - 1, सीरियल 2 = Live Period - 2
+      // **FIXED STEP LOGIC:** // i=0 (Row 1) -> LiveP - 1
+      // i=1 (Row 2) -> LiveP - 2
+      // i=9 (Row 10) -> LiveP - 10
+      const rowPeriod = lastLivePeriod - (i + 1);
+
+      const circleClass = (i === 9) ? "circle-no special-10" : "circle-no";
+
       row.innerHTML = `
-        <div class="circle-no" onclick="handleToggle(${i})">${i + 1}</div>
-        <div class="period-info">P: ${lastPeriod - (i + 1)}</div>
+        <div class="${circleClass}" onclick="handleToggle(${i})">${i + 1}</div>
+        <div class="period-info">
+          PERIOD: <span class="period-val">${rowPeriod}</span>
+        </div>
         <div class="num-pad">${pads}</div>
       `;
       list.appendChild(row);
     }
   }
 
-  function setVal(idx, val) { historyData[idx] = val; render(); }
+  function setVal(idx, val) { 
+    historyData[idx] = val; 
+    render(); 
+  }
   
   function handleToggle(idx) {
+    if(idx === 0) isCollapsed = !isCollapsed;
     if(idx === 9) showFull = !showFull;
     render();
   }
 
   function generateResult() {
     const data = historyData.filter(v => v !== null);
-    if(data.length < 3) { alert("कम से कम 3 हिस्ट्री भरें!"); return; }
+    if(data.length < 3) { alert("कम से कम 3 पीरीयड का डेटा भरें!"); return; }
+    
     const avg = data.reduce((a, b) => a + b, 0) / data.length;
     const res = (avg > 4.4) ? "BIG" : "SMALL";
+    
     const predEl = document.getElementById('prediction-text');
     predEl.innerText = res;
     predEl.style.color = (res === "BIG") ? "var(--neon)" : "var(--gold)";
+    
+    // रिजल्ट के बाद स्क्रीन साफ़ करने के लिए कोलैप्स करें
+    isCollapsed = true;
+    render();
   }
 
   setInterval(updateSystem, 1000);
