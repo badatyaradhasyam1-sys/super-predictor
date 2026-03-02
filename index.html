@@ -3,146 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Super Predictor V4 - Perfect Sync</title>
+    <title>Super Predictor AI - Final Stable</title>
     <style>
-        :root { --neon: #00f3ff; --bg: #0b1426; --gold: #ffcc00; }
-        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 420px; padding: 15px; box-sizing: border-box; }
-        
-        .header { text-align: center; color: var(--neon); font-size: 24px; font-weight: 900; text-shadow: 0 0 10px var(--neon); margin: 20px 0; }
-        
-        .status-card { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,243,255,0.2); }
-        #timer { font-size: 32px; color: var(--gold); font-weight: bold; }
+        :root {
+            --bg: #0b1426; --neon: #00f3ff; --gold: #ffcc00;
+            --red: #ff4d4d; --green: #2ecc71; --purple: #9b59b6;
+        }
+        body {
+            margin: 0; background-color: var(--bg); color: white;
+            font-family: 'Segoe UI', Arial, sans-serif; display: flex; justify-content: center;
+        }
+        .container {
+            width: 100%; max-width: 420px; min-height: 100vh; padding: 15px;
+            background: linear-gradient(180deg, #101c33 0%, #0b1426 100%);
+            box-sizing: border-box; border: 1px solid rgba(0,243,255,0.1);
+        }
+        .header-main {
+            text-align: center; font-size: 24px; font-weight: 900;
+            color: var(--neon); text-shadow: 0 0 15px var(--neon);
+            margin: 15px 0; text-transform: uppercase;
+        }
+        .status-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,243,255,0.2);
+            border-radius: 15px; padding: 12px; display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 15px;
+        }
+        #timer { font-size: 34px; color: var(--gold); font-weight: 900; }
 
-        .signal-box { border: 2px solid var(--neon); border-radius: 20px; padding: 40px 10px; text-align: center; margin: 20px 0; background: rgba(0,243,255,0.02); }
-        #prediction-text { font-size: 45px; font-weight: 900; color: #4b5563; transition: 0.3s; }
+        /* Prediction Area */
+        .ai-box {
+            position: relative; border: 2px solid var(--neon); border-radius: 20px; 
+            padding: 25px 10px; text-align: center; margin-bottom: 20px; 
+            background: rgba(0,243,255,0.02); overflow: hidden;
+        }
+        .scan-line {
+            position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--neon); box-shadow: 0 0 15px var(--neon);
+            display: none; animation: scan 1.2s linear infinite;
+        }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        #pred-txt { font-size: 38px; font-weight: 900; color: #4b5563; }
 
-        .row { background: rgba(255,255,255,0.03); border-radius: 50px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); }
-        .circle-id { min-width: 32px; height: 32px; border-radius: 50%; background: var(--neon); color: black; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 0 10px var(--neon); cursor: pointer; }
-        .period-info { flex: 1; font-size: 10px; color: #94a3b8; line-height: 1.2; }
-        .p-val { color: var(--neon); font-weight: bold; display: block; font-size: 12px; }
+        /* History List */
+        .history-list { display: flex; flex-direction: column; gap: 8px; }
+        .row {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 50px; padding: 5px 10px; display: flex; align-items: center; gap: 8px;
+            transition: 0.3s;
+        }
+        .row-id {
+            min-width: 28px; height: 28px; border-radius: 50%;
+            background: var(--neon); color: black; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 12px;
+        }
+        .p-num { color: var(--neon); font-weight: bold; font-size: 11px; font-family: monospace; }
 
-        .ball-grid { display: flex; gap: 4px; }
-        .ball { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--neon); color: var(--neon); display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; transition: 0.2s; }
-        .ball.selected { background: var(--neon); color: black; font-weight: bold; transform: scale(1.1); box-shadow: 0 0 8px var(--neon); }
+        /* Real Ball Design */
+        .ball-box { display: flex; gap: 3px; }
+        .ball {
+            width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+            font-size: 10px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-weight: bold; color: white; background: #1a263f;
+        }
+        .ball.b-0 { border-color: #9b59b6; } .ball.b-5 { border-color: #2ecc71; }
+        .ball.red { border-color: var(--red); } .ball.green { border-color: var(--green); }
         
-        .btn-predict { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), #bc13fe); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: 10px; }
+        .ball.selected { transform: scale(1.15); border-width: 2px; box-shadow: 0 0 8px white; }
+        .ball.sel-red { background: var(--red); }
+        .ball.sel-green { background: var(--green); }
+        .ball.sel-mixed { background: linear-gradient(45deg, var(--red) 50%, var(--purple) 50%); }
+        .ball.sel-mixed-g { background: linear-gradient(45deg, var(--green) 50%, var(--purple) 50%); }
+
+        .btn-action {
+            width: 100%; padding: 16px; margin-top: 20px;
+            background: linear-gradient(90deg, var(--neon), #bc13fe);
+            border: none; border-radius: 12px; color: white;
+            font-weight: bold; font-size: 16px; cursor: pointer;
+        }
+        #toast {
+            position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%);
+            background: var(--neon); color: black; padding: 10px 20px;
+            border-radius: 50px; font-weight: bold; transition: 0.4s; z-index: 100;
+        }
+        #toast.show { bottom: 20px; }
     </style>
 </head>
 <body>
 
+<div id="toast">HISTORY UPDATED ✓</div>
+
 <div class="container">
-    <div class="header">SUPER PREDICTOR</div>
+    <div class="header-main">SUPER PREDICTOR</div>
 
     <div class="status-card">
         <div>
-            <div style="font-size: 10px; color: #94a3b8;">LIVE PERIOD</div>
-            <div id="live-period" style="font-size: 16px; font-weight: bold;">---</div>
+            <span style="font-size: 9px; color: #94a3b8;">LIVE PERIOD</span>
+            <span id="live-p" style="display:block; font-weight:bold;">---</span>
         </div>
         <div id="timer">00:00</div>
     </div>
 
-    <div class="signal-box">
-        <div id="prediction-text">WAITING DATA</div>
+    <div class="ai-box" id="ai-box">
+        <div class="scan-line" id="scan-line"></div>
+        <div id="pred-txt">AI READY</div>
     </div>
 
-    <div id="history-list"></div>
+    <div id="list-container" class="history-list"></div>
 
-    <button class="btn-predict" onclick="analyzeResult()">BETTER RESULT</button>
+    <button class="btn-action" onclick="runAI()">Better Result</button>
 </div>
 
 <script>
-    let userInputs = new Array(20).fill(null);
-    let lastProcessedPeriod = 0;
-    let isFull = false;
-    let isCollapsed = false;
+    // LocalStorage से डेटा उठाना (अगर है तो)
+    let inputStore = JSON.parse(localStorage.getItem('wingo_data')) || new Array(20).fill(null);
+    let currentLivePeriod = 0;
+    let expanded = false;
 
-    function coreEngine() {
+    function init() {
+        refresh();
+        setInterval(refresh, 1000);
+    }
+
+    function refresh() {
         const now = new Date();
-        const seconds = now.getUTCSeconds();
-        
-        // WinGo 30sec Logic (0-29s and 30-59s are 2 periods)
-        const total30SecIntervals = Math.floor((now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + seconds) / 30);
-        
-        const dateStr = now.getUTCFullYear().toString() + 
-                        (now.getUTCMonth() + 1).toString().padStart(2, '0') + 
-                        now.getUTCDate().toString().padStart(2, '0');
-        
-        const currentLiveP = dateStr + "1000" + (10001 + total30SecIntervals);
-        
-        // Update UI
-        document.getElementById('live-period').innerText = currentLiveP;
-        
-        // Timer display (seconds remaining in current 30s block)
-        const remaining = 30 - (seconds % 30);
-        document.getElementById('timer').innerText = "00:" + remaining.toString().padStart(2, '0');
+        const minsTotal = now.getUTCHours() * 60 + now.getUTCMinutes();
+        const secs = now.getUTCSeconds();
 
-        // Shifting Logic: When period actually changes
-        const currentPNum = parseInt(currentLiveP);
-        if (lastProcessedPeriod !== 0 && currentPNum > lastProcessedPeriod) {
-            // Shift inputs down
-            for (let i = 19; i > 0; i--) {
-                userInputs[i] = userInputs[i - 1];
-            }
-            userInputs[0] = null; // Clear Row 1 for new period
-        }
+        const dateStr = now.getUTCFullYear().toString() + 
+                        (now.getUTCMonth()+1).toString().padStart(2,'0') + 
+                        now.getUTCDate().toString().padStart(2,'0');
         
-        lastProcessedPeriod = currentPNum;
+        const newPeriod = parseInt(dateStr + "1000" + (10001 + minsTotal));
+        
+        document.getElementById('timer').innerText = "00:" + (59 - secs).toString().padStart(2,'0');
+        document.getElementById('live-p').innerText = newPeriod;
+
+        // **CRITICAL HISTORY SHIFT LOGIC**
+        if (currentLivePeriod !== 0 && newPeriod > currentLivePeriod) {
+            // डेटा को एक कदम नीचे खिसकाओ
+            for (let i = 19; i > 0; i--) {
+                inputStore[i] = inputStore[i-1];
+            }
+            inputStore[0] = null; // नया पीरियड आया, पहला बॉक्स खाली
+            saveData();
+            showToast("DATA SHIFTED ✓");
+        }
+
+        currentLivePeriod = newPeriod;
         renderRows();
     }
 
     function renderRows() {
-        const list = document.getElementById('history-list');
-        list.innerHTML = "";
-        
-        let limit = isCollapsed ? 1 : (isFull ? 20 : 10);
+        const container = document.getElementById('list-container');
+        container.innerHTML = "";
+        let limit = expanded ? 20 : 10;
 
         for (let i = 0; i < limit; i++) {
-            const rowP = lastProcessedPeriod - (i + 1);
             const row = document.createElement('div');
             row.className = 'row';
+            const rowP = currentLivePeriod - (i + 1);
             
             let balls = '';
             for(let n=0; n<=9; n++) {
-                const sel = userInputs[i] === n ? 'selected' : '';
-                balls += `<div class="ball ${sel}" onclick="setVal(${i}, ${n})">${n}</div>`;
+                let colorClass = (n % 2 === 0) ? 'red' : 'green';
+                if(n === 0 || n === 5) colorClass = (n === 0) ? 'b-0' : 'b-5';
+                
+                let selClass = "";
+                if(inputStore[i] === n) {
+                    selClass = "selected ";
+                    if(n === 0) selClass += "sel-mixed";
+                    else if(n === 5) selClass += "sel-mixed-g";
+                    else selClass += (n % 2 === 0) ? "sel-red" : "sel-green";
+                }
+                balls += `<div class="ball ${colorClass} ${selClass}" onclick="setVal(${i}, ${n})">${n}</div>`;
             }
 
+            const idStyle = (i === 9) ? "background:#bc13fe; color:white;" : "";
             row.innerHTML = `
-                <div class="circle-id" onclick="toggleView(${i})">${i + 1}</div>
-                <div class="period-info">PERIOD:<span class="p-val">${rowP}</span></div>
-                <div class="ball-grid">${balls}</div>
+                <div class="row-id" style="${idStyle}" onclick="handleToggle(${i})">${i + 1}</div>
+                <div style="flex:1; font-size:10px;"><span class="p-num">${rowP}</span></div>
+                <div class="ball-box">${balls}</div>
             `;
-            list.appendChild(row);
+            container.appendChild(row);
         }
     }
 
-    function setVal(idx, val) { userInputs[idx] = val; renderRows(); }
-
-    function toggleView(idx) {
-        if(idx === 0) isCollapsed = !isCollapsed;
-        if(idx === 9) isFull = !isFull;
+    function setVal(idx, val) {
+        inputStore[idx] = val;
+        saveData();
         renderRows();
     }
 
-    function analyzeResult() {
-        const active = userInputs.filter(v => v !== null);
-        if(active.length < 3) return alert("Please input at least 3 historical numbers!");
-        
-        const avg = active.reduce((a, b) => a + b, 0) / active.length;
-        const res = avg >= 4.5 ? "BIG" : "SMALL";
-        
-        const txt = document.getElementById('prediction-text');
-        txt.innerText = res;
-        txt.style.color = res === "BIG" ? "var(--neon)" : "var(--gold)";
-        txt.style.textShadow = "0 0 20px " + (res === "BIG" ? "cyan" : "gold");
-        
-        isCollapsed = true;
+    function saveData() {
+        localStorage.setItem('wingo_data', JSON.stringify(inputStore));
+    }
+
+    function handleToggle(idx) {
+        if(idx === 9) expanded = !expanded;
         renderRows();
     }
 
-    setInterval(coreEngine, 1000);
-    coreEngine();
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function runAI() {
+        const data = inputStore.filter(v => v !== null);
+        if(data.length < 3) return alert("Please fill at least 3 history inputs!");
+
+        const predTxt = document.getElementById('pred-txt');
+        const scanLine = document.getElementById('scan-line');
+
+        predTxt.innerText = "SCANNING...";
+        predTxt.style.color = "var(--gold)";
+        scanLine.style.display = "block";
+
+        setTimeout(() => {
+            const avg = data.reduce((a, b) => a + b, 0) / data.length;
+            const res = (avg >= 4.5) ? "BIG" : "SMALL";
+            scanLine.style.display = "none";
+            predTxt.innerText = res;
+            predTxt.style.color = (res === "BIG") ? "var(--neon)" : "var(--gold)";
+            predTxt.style.textShadow = `0 0 20px ${(res === "BIG") ? 'cyan' : 'orange'}`;
+            showToast("ANALYSIS COMPLETE ✓");
+        }, 1500);
+    }
+
+    init();
 </script>
 </body>
 </html>
