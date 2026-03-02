@@ -1,193 +1,204 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Super Predictor Pro AI</title>
-  <style>
-    :root {
-      --neon: #00f3ff; --bg: #020617; --glass: rgba(255, 255, 255, 0.05);
-      --gold: #fbbf24; --purple: #bc13fe;
-    }
-    body {
-      margin: 0; background: var(--bg); color: white;
-      font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center;
-    }
-    .container {
-      width: 100%; max-width: 420px; min-height: 100vh; padding: 15px;
-      border: 1px solid rgba(0,243,255,0.2);
-      background: radial-gradient(circle at top, #1e293b 0%, #020617 100%);
-    }
-    .header {
-      text-align: center; font-size: 26px; font-weight: 900;
-      letter-spacing: 4px; color: var(--neon); text-shadow: 0 0 15px var(--neon);
-      margin: 15px 0;
-    }
-    .status-bar {
-      display: flex; justify-content: space-between; align-items: center;
-      background: var(--glass); padding: 12px; border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;
-    }
-    #timer { font-size: 32px; color: var(--gold); font-weight: bold; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Super Predictor Pro AI</title>
+    <style>
+        :root {
+            --neon: #00f3ff; --bg: #0b1426; --glass: rgba(255, 255, 255, 0.05);
+            --gold: #ffcc00; --purple: #bc13fe;
+        }
+        body {
+            margin: 0; background-color: var(--bg); color: white;
+            font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center;
+        }
+        .container {
+            width: 100%; max-width: 420px; min-height: 100vh; padding: 15px;
+            background: linear-gradient(180deg, #0f1c35 0%, #0b1426 100%);
+            border: 1px solid rgba(0, 243, 255, 0.1); box-sizing: border-box;
+        }
+        .header-title {
+            text-align: center; font-size: 24px; font-weight: 900;
+            color: var(--neon); text-shadow: 0 0 15px var(--neon); margin: 15px 0;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        .status-card {
+            background: rgba(255, 255, 255, 0.03); border-radius: 15px; padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1); display: flex;
+            justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .period-box { font-size: 14px; color: #94a3b8; }
+        #current-p { font-size: 18px; color: white; font-weight: bold; display: block; margin-top: 4px;}
+        #timer { font-size: 36px; color: var(--gold); font-weight: 900; }
 
-    .prediction-area {
-      padding: 30px; margin-bottom: 25px; border-radius: 20px;
-      border: 2px solid var(--neon); text-align: center; background: #0f172a;
-      box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-    }
-    #prediction-text { font-size: 40px; font-weight: 900; color: #64748b; letter-spacing: 3px; }
+        .signal-display {
+            background: rgba(0, 243, 255, 0.02); border: 2px solid var(--neon);
+            border-radius: 25px; padding: 35px 20px; text-align: center;
+            margin-bottom: 25px; box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+        #prediction-text { font-size: 42px; font-weight: 900; color: #4b5563; letter-spacing: 2px; }
 
-    .history-row {
-      display: flex; align-items: center; gap: 10px;
-      background: var(--glass); padding: 8px 12px; border-radius: 50px;
-      border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px;
-    }
-    .circle-no {
-      width: 35px; height: 35px; border-radius: 50%; background: var(--neon);
-      color: #000; display: flex; justify-content: center; align-items: center;
-      font-weight: bold; cursor: pointer; box-shadow: 0 0 10px var(--neon);
-    }
-    .special-10 { background: var(--purple) !important; color: white !important; }
-    
-    .period-info { flex: 1; font-size: 10px; color: #94a3b8; font-family: monospace; line-height: 1.2; }
-    .period-val { color: var(--neon); display: block; font-size: 11px; }
+        /* History Table Styles */
+        .history-list { display: flex; flex-direction: column; gap: 12px; }
+        .row {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(0, 243, 255, 0.15);
+            border-radius: 50px; padding: 8px 15px; display: flex; align-items: center; gap: 12px;
+        }
+        .circle-id {
+            min-width: 32px; height: 32px; border-radius: 50%;
+            background: var(--neon); color: black; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 12px var(--neon); cursor: pointer;
+        }
+        .period-info { flex: 1; font-size: 9px; color: #64748b; font-family: monospace; }
+        .p-val { color: var(--neon); font-size: 11px; display: block; margin-top: 2px; }
 
-    .num-pad { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
-    .num-btn {
-      width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--neon);
-      color: var(--neon); font-size: 11px; display: flex;
-      justify-content: center; align-items: center; cursor: pointer;
-    }
-    .num-btn.selected { background: var(--neon); color: #000; box-shadow: 0 0 8px var(--neon); }
+        /* Ball Style Input Buttons */
+        .ball-container { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; }
+        .ball-container::-webkit-scrollbar { display: none; }
+        .ball {
+            width: 26px; height: 26px; border-radius: 50%;
+            border: 1px solid rgba(0, 243, 255, 0.4); color: var(--neon);
+            font-size: 12px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s; font-weight: bold;
+        }
+        .ball.active {
+            background: var(--neon); color: black; border-color: white;
+            box-shadow: 0 0 10px var(--neon); transform: scale(1.1);
+        }
 
-    .btn-action {
-      width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon), var(--purple));
-      border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 18px; cursor: pointer;
-      margin-top: 10px;
-    }
-  </style>
+        .btn-boost {
+            width: 100%; padding: 18px; margin-top: 25px;
+            background: linear-gradient(90deg, var(--neon), var(--purple));
+            border: none; border-radius: 15px; color: white;
+            font-weight: bold; font-size: 18px; cursor: pointer;
+            box-shadow: 0 5px 20px rgba(188, 19, 254, 0.4);
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="header">SUPER PREDICTOR</div>
+    <div class="header-title">SUPER PREDICTOR</div>
 
-  <div class="status-bar">
-    <div>
-      <div style="font-size: 10px; color: #94a3b8;">LIVE PERIOD</div>
-      <div id="current-p" style="font-size: 16px; font-weight: bold; color: white;">---</div>
+    <div class="status-card">
+        <div class="period-box">
+            LIVE PERIOD
+            <span id="current-p">---</span>
+        </div>
+        <div id="timer">00:00</div>
     </div>
-    <div id="timer">00:00</div>
-  </div>
 
-  <div class="prediction-area">
-    <div style="font-size: 11px; color: #94a3b8; margin-bottom: 5px;">AI SIGNAL</div>
-    <div id="prediction-text">WAITING DATA</div>
-  </div>
+    <div class="signal-display">
+        <div style="font-size: 10px; color: #94a3b8; margin-bottom: 8px; letter-spacing: 2px;">AI SIGNAL</div>
+        <div id="prediction-text">WAITING DATA</div>
+    </div>
 
-  <div id="history-list"></div>
-  <button class="btn-action" onclick="generateResult()">BETTER RESULT</button>
+    <div id="history-container" class="history-list"></div>
+
+    <button class="btn-boost" onclick="getResult()">BETTER RESULT</button>
 </div>
 
 <script>
-  let historyData = new Array(20).fill(null);
-  let lastLivePeriod = 0;
-  let showFull = false;
-  let isCollapsed = false;
+    let historyData = new Array(20).fill(null);
+    let lastP = 0;
+    let isFullView = false;
+    let isCollapsed = false;
 
-  function updateSystem() {
-    const now = new Date();
-    const utcHours = now.getUTCHours();
-    const utcMinutes = now.getUTCMinutes();
-    const utcSeconds = now.getUTCSeconds();
+    function startEngine() {
+        updateTime();
+        setInterval(updateTime, 1000);
+    }
 
-    // सटीक पीरीयड जनरेशन
-    const dateStr = now.getUTCFullYear().toString() + 
-                    (now.getUTCMonth()+1).toString().padStart(2,'0') + 
-                    now.getUTCDate().toString().padStart(2,'0');
-    
-    const currentLiveP = parseInt(dateStr + "1000" + (10001 + (utcHours * 60 + utcMinutes)));
-    
-    document.getElementById('current-p').innerText = currentLiveP;
-    document.getElementById('timer').innerText = "00:" + (59 - utcSeconds).toString().padStart(2,'0');
+    function updateTime() {
+        const now = new Date();
+        const hrs = now.getUTCHours();
+        const mins = now.getUTCMinutes();
+        const secs = now.getUTCSeconds();
 
-    // **SHIFTING LOGIC:** जब लाइव पीरीयड बढ़ेगा, डेटा और पीरीयड दोनों खिसकेंगे
-    if (lastLivePeriod !== 0 && currentLiveP > lastLivePeriod) {
-        // डेटा को नीचे धकेलें
-        for (let i = 19; i > 0; i--) {
-            historyData[i] = historyData[i-1];
+        const datePart = now.getUTCFullYear().toString() + 
+                         (now.getUTCMonth()+1).toString().padStart(2,'0') + 
+                         now.getUTCDate().toString().padStart(2,'0');
+        
+        // Exact period calculation
+        const currentLiveP = parseInt(datePart + "1000" + (10001 + (hrs * 60 + mins)));
+        
+        document.getElementById('current-p').innerText = currentLiveP;
+        document.getElementById('timer').innerText = "00:" + (59 - secs).toString().padStart(2,'0');
+
+        // Logic: Shift data when period changes
+        if (lastP !== 0 && currentLiveP > lastP) {
+            for (let i = 19; i > 0; i--) {
+                historyData[i] = historyData[i-1];
+            }
+            historyData[0] = null; // New empty slot for Row 1
         }
-        historyData[0] = null; // सीरियल 1 को फ्रेश करें
+        
+        lastP = currentLiveP;
+        renderHistory();
     }
-    
-    lastLivePeriod = currentLiveP;
-    render();
-  }
 
-  function render() {
-    const list = document.getElementById('history-list');
-    list.innerHTML = "";
-    
-    // 1 (collapsed), 10 (default), 20 (expanded)
-    let limit = isCollapsed ? 1 : (showFull ? 20 : 10);
+    function renderHistory() {
+        const container = document.getElementById('history-container');
+        container.innerHTML = "";
+        
+        // Show 1 (collapsed), 10 (standard), or 20 (full)
+        let count = isCollapsed ? 1 : (isFullView ? 20 : 10);
 
-    for (let i = 0; i < limit; i++) {
-      const row = document.createElement('div');
-      row.className = 'history-row';
-      
-      let pads = '';
-      for(let n=0; n<=9; n++) {
-        const selected = historyData[i] === n ? 'selected' : '';
-        pads += `<div class="num-btn ${selected}" onclick="setVal(${i}, ${n})">${n}</div>`;
-      }
+        for (let i = 0; i < count; i++) {
+            const row = document.createElement('div');
+            row.className = 'row';
+            
+            let ballHTML = '';
+            for(let n=0; n<=9; n++) {
+                const activeClass = historyData[i] === n ? 'active' : '';
+                ballHTML += `<div class="ball ${activeClass}" onclick="selectNum(${i}, ${n})">${n}</div>`;
+            }
 
-      // **FIXED STEP LOGIC:** // i=0 (Row 1) -> LiveP - 1
-      // i=1 (Row 2) -> LiveP - 2
-      // i=9 (Row 10) -> LiveP - 10
-      const rowPeriod = lastLivePeriod - (i + 1);
+            // CRITICAL FIX: Step-down periods (10350 -> 10349 -> 10348)
+            const rowP = lastP - (i + 1);
 
-      const circleClass = (i === 9) ? "circle-no special-10" : "circle-no";
-
-      row.innerHTML = `
-        <div class="${circleClass}" onclick="handleToggle(${i})">${i + 1}</div>
-        <div class="period-info">
-          PERIOD: <span class="period-val">${rowPeriod}</span>
-        </div>
-        <div class="num-pad">${pads}</div>
-      `;
-      list.appendChild(row);
+            row.innerHTML = `
+                <div class="circle-id" onclick="toggleRows(${i})">${i + 1}</div>
+                <div class="period-info">PERIOD: <span class="p-val">${rowP}</span></div>
+                <div class="ball-container">${ballHTML}</div>
+            `;
+            container.appendChild(row);
+        }
     }
-  }
 
-  function setVal(idx, val) { 
-    historyData[idx] = val; 
-    render(); 
-  }
-  
-  function handleToggle(idx) {
-    if(idx === 0) isCollapsed = !isCollapsed;
-    if(idx === 9) showFull = !showFull;
-    render();
-  }
+    function selectNum(idx, val) {
+        historyData[idx] = val;
+        renderHistory();
+    }
 
-  function generateResult() {
-    const data = historyData.filter(v => v !== null);
-    if(data.length < 3) { alert("कम से कम 3 पीरीयड का डेटा भरें!"); return; }
-    
-    const avg = data.reduce((a, b) => a + b, 0) / data.length;
-    const res = (avg > 4.4) ? "BIG" : "SMALL";
-    
-    const predEl = document.getElementById('prediction-text');
-    predEl.innerText = res;
-    predEl.style.color = (res === "BIG") ? "var(--neon)" : "var(--gold)";
-    
-    // रिजल्ट के बाद स्क्रीन साफ़ करने के लिए कोलैप्स करें
-    isCollapsed = true;
-    render();
-  }
+    function toggleRows(idx) {
+        if(idx === 0) isCollapsed = !isCollapsed;
+        if(idx === 9) isFullView = !isFullView;
+        renderHistory();
+    }
 
-  setInterval(updateSystem, 1000);
-  updateSystem();
+    function getResult() {
+        const valid = historyData.filter(v => v !== null);
+        if(valid.length < 3) {
+            alert("Please input at least 3 historical numbers!");
+            return;
+        }
+
+        const avg = valid.reduce((a, b) => a + b, 0) / valid.length;
+        const res = avg >= 4.5 ? "BIG" : "SMALL";
+        
+        const txt = document.getElementById('prediction-text');
+        txt.innerText = res;
+        txt.style.color = res === "BIG" ? "var(--neon)" : "var(--gold)";
+        txt.style.textShadow = `0 0 20px ${res === "BIG" ? 'var(--neon)' : 'var(--gold)'}`;
+        
+        isCollapsed = true;
+        renderHistory();
+    }
+
+    startEngine();
 </script>
 </body>
 </html>
