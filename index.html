@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Super Predictor Pro AI - V4 (Auto-Shift)</title>
+  <title>Super Predictor Pro AI - V5 (Fixed)</title>
   <style>
     :root {
       --neon: #00f3ff;
@@ -57,7 +57,6 @@
       display: flex; align-items: center; gap: 8px;
       background: var(--glass); padding: 6px 10px; border-radius: 50px;
       border: 1px solid rgba(0, 243, 255, 0.1);
-      transition: all 0.3s ease;
     }
     .circle-no {
       width: 32px; height: 32px; border-radius: 50%;
@@ -103,121 +102,4 @@
 
   <div id="history-list" class="history-section"></div>
 
-  <button class="btn-action" onclick="processAI()">Get AI Signal</button>
-</div>
-
-<script>
-  let historyData = new Array(20).fill(null);
-  let viewState = 'hide'; // 'hide', 'expanded'
-  let lastPeriod = "";
-
-  function vibrate(ms) {
-    if (navigator.vibrate) navigator.vibrate(ms);
-  }
-
-  function updateTimerAndPeriod() {
-    const now = new Date();
-    const seconds = now.getUTCSeconds();
-    const remainingSeconds = 59 - seconds;
-
-    const dateStr = now.getUTCFullYear().toString() + (now.getUTCMonth() + 1).toString().padStart(2, '0') + now.getUTCDate().toString().padStart(2, '0');
-    const totalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
-    const currentPeriod = dateStr + "1000" + (10001 + totalMinutes);
-
-    if (currentPeriod !== lastPeriod) {
-      // Shift Logic: 1 -> 2, 2 -> 3... 19 -> 20
-      if(lastPeriod !== "") {
-        for (let i = 19; i > 0; i--) {
-          historyData[i] = historyData[i-1];
-        }
-        historyData[0] = null; // New period start, clear row 1
-        renderRows();
-      }
-      
-      lastPeriod = currentPeriod;
-      document.getElementById('current-period').innerText = currentPeriod;
-      vibrate(100);
-    }
-
-    document.getElementById('timer').innerText = "00:" + remainingSeconds.toString().padStart(2, '0');
-  }
-
-  function renderRows() {
-    const list = document.getElementById('history-list');
-    list.innerHTML = "";
-    
-    // View Logic
-    let limit = (viewState === 'hide') ? 1 : 20;
-
-    for (let i = 0; i < limit; i++) {
-      const row = document.createElement('div');
-      row.className = `history-row`;
-      let numPadHTML = '';
-      for(let n=0; n<=9; n++) {
-        const isActive = historyData[i] === n ? 'active' : '';
-        numPadHTML += `<div class="num-btn ${isActive}" onclick="setInput(${i}, ${n})">${n}</div>`;
-      }
-      
-      // Circle No Click Logic
-      let clickAction = "";
-      if (i === 0) clickAction = `onclick="toggleView('hide')"`;
-      if (i === 9) clickAction = `onclick="toggleView('expand')"`;
-
-      row.innerHTML = `<div class="circle-no" ${clickAction}>${i + 1}</div><div class="num-pad">${numPadHTML}</div>`;
-      list.appendChild(row);
-    }
-  }
-
-  function toggleView(mode) {
-    vibrate(40);
-    viewState = (mode === 'hide') ? 'hide' : 'expanded';
-    renderRows();
-  }
-
-  function setInput(index, val) {
-    vibrate(30);
-    historyData[index] = val;
-    renderRows();
-  }
-
-  function processAI() {
-    vibrate(60);
-    const filledData = historyData.filter(v => v !== null);
-    if(filledData.length < 3) {
-      alert("Please fill at least 3 numbers!");
-      return;
-    }
-
-    const predEl = document.getElementById('prediction-text');
-    const strengthEl = document.getElementById('strength');
-    
-    predEl.classList.remove('result-glow');
-    void predEl.offsetWidth; 
-    predEl.classList.add('result-glow');
-
-    const avg = filledData.reduce((a, b) => a + b, 0) / filledData.length;
-    const lastNum = filledData[0];
-
-    if (avg > 7.5 || avg < 2.5) {
-      let size = (avg > 5) ? "BIG" : "SMALL";
-      predEl.innerText = size;
-      predEl.style.color = (size === "BIG") ? "var(--neon)" : "#fbbf24";
-      strengthEl.innerText = "99% (SIZE)";
-    } else {
-      let color = ([1,3,7,9].includes(lastNum)) ? "GREEN" : "RED";
-      if(lastNum === 0 || lastNum === 5) color += "+V";
-      predEl.innerText = color;
-      predEl.style.color = (color.includes("RED")) ? "var(--red)" : "var(--green)";
-      strengthEl.innerText = "94% (COLOR)";
-    }
-
-    viewState = 'hide';
-    renderRows();
-  }
-
-  setInterval(updateTimerAndPeriod, 1000);
-  updateTimerAndPeriod();
-  renderRows();
-</script>
-</body>
-</html>
+  <button class="btn-action" onclick="processAI()">Get
