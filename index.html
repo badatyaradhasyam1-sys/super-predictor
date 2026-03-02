@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AI Predictor Pro - Loss Fix V6</title>
+  <title>AI Predictor Pro - Data Shift Fix</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
 
     :root {
       --neon: #00f3ff;
       --bg: #010409;
-      --glass: rgba(255, 255, 255, 0.03);
+      --glass: rgba(255, 255, 255, 0.05);
       --purple: #8a2be2;
       --red: #ff3e3e;
       --green: #00ff88;
@@ -20,295 +20,224 @@
     body {
       margin: 0; background: var(--bg); color: #e6edf3;
       font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center;
-      overflow-x: hidden;
     }
 
-    /* Auth Screen */
-    #auth-screen {
-      position: fixed; inset: 0; background: var(--bg);
-      z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-
-    .auth-card {
-      background: rgba(13, 17, 23, 0.95); padding: 30px; border-radius: 20px;
-      border: 1px solid var(--neon); width: 100%; max-width: 320px; text-align: center;
-    }
-
-    input {
-      width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px;
-      border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box;
-    }
-
-    .hidden { display: none !important; }
-
-    /* Main Container */
     .container {
       width: 100%; max-width: 420px; min-height: 100vh;
       padding: 20px 15px; box-sizing: border-box;
       background: radial-gradient(circle at 50% 0%, #161b22 0%, #010409 100%);
     }
 
-    .user-info {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 15px; background: var(--glass); border-radius: 12px;
-      margin-bottom: 15px; border: 1px solid rgba(0, 243, 255, 0.1);
-    }
-
     .header {
       text-align: center; font-family: 'Orbitron', sans-serif;
-      font-size: 20px; font-weight: 700; color: var(--neon); margin-bottom: 20px;
+      font-size: 22px; font-weight: 700; letter-spacing: 4px;
+      color: var(--neon); text-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+      margin-bottom: 25px;
     }
 
     .status-bar {
       display: flex; justify-content: space-between; align-items: center;
-      background: var(--glass); padding: 12px; border-radius: 12px; margin-bottom: 15px;
+      background: var(--glass); padding: 15px; border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px;
     }
 
-    #timer { font-family: 'Orbitron', sans-serif; font-size: 24px; color: var(--gold); }
+    #timer { font-family: 'Orbitron', sans-serif; font-size: 26px; color: var(--gold); }
 
     .main-display {
-      background: rgba(13, 17, 23, 0.8); border-radius: 24px;
-      padding: 40px 20px; text-align: center; border: 1px solid var(--neon);
-      margin-bottom: 20px;
+      background: rgba(13, 17, 23, 0.9); border-radius: 24px;
+      padding: 45px 20px; text-align: center;
+      border: 1px solid var(--neon);
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+      margin-bottom: 25px;
     }
 
     #prediction-text { 
-      font-family: 'Orbitron', sans-serif; font-size: 48px; font-weight: 700; 
-      color: #30363d; transition: 0.4s;
+      font-family: 'Orbitron', sans-serif; font-size: 52px; font-weight: 700; 
+      color: #30363d; letter-spacing: 3px; transition: 0.4s;
     }
 
-    .result-glow { animation: proZoom 0.6s forwards; }
-    @keyframes proZoom {
-      0% { transform: scale(0.6); opacity: 0; }
+    .result-glow { animation: zoomIn 0.5s forwards; }
+    @keyframes zoomIn {
+      0% { transform: scale(0.7); opacity: 0; }
       100% { transform: scale(1); opacity: 1; text-shadow: 0 0 30px currentColor; }
     }
 
+    .history-section { display: flex; flex-direction: column; gap: 10px; }
     .history-row {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--glass); padding: 8px; border-radius: 50px; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--glass); padding: 8px 12px; border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
     .circle-no {
-      width: 30px; height: 30px; border-radius: 50%;
+      width: 32px; height: 32px; border-radius: 50%;
       background: linear-gradient(135deg, var(--neon), var(--purple));
       color: #000; display: flex; justify-content: center; align-items: center;
-      font-weight: bold; cursor: pointer; flex-shrink: 0;
+      font-weight: 700; font-size: 13px; cursor: pointer; flex-shrink: 0;
     }
 
-    .num-pad { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+    .num-pad { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; }
     .num-btn {
-      width: 25px; height: 25px; border-radius: 50%;
-      border: 1px solid #30363d; color: #8b949e; font-size: 11px;
-      display: flex; justify-content: center; align-items: center; flex-shrink: 0;
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1px solid #30363d; color: #8b949e; 
+      font-size: 11px; display: flex; justify-content: center; align-items: center; flex-shrink: 0;
     }
-    .num-btn.active { background: var(--neon); color: #000; box-shadow: 0 0 10px var(--neon); }
+    .num-btn.active { 
+      background: var(--neon); color: #000; border-color: var(--neon);
+      box-shadow: 0 0 10px var(--neon);
+    }
 
     .btn-action {
-      width: 100%; padding: 18px; background: linear-gradient(135deg, var(--neon), var(--purple));
-      border: none; border-radius: 15px; color: white; font-weight: bold; font-family: 'Orbitron';
-      cursor: pointer; margin-top: 10px; text-transform: uppercase;
-    }
-
-    #recharge-screen {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-        z-index: 2000; display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 18px; margin-top: 20px;
+      background: linear-gradient(135deg, var(--neon), var(--purple));
+      border: none; border-radius: 15px; color: white;
+      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+      cursor: pointer; text-transform: uppercase;
     }
   </style>
 </head>
 <body>
 
-<div id="auth-screen">
-  <div class="auth-card">
-    <h2 style="color:var(--neon); font-family:'Orbitron'">LOGIN</h2>
-    <input type="text" id="username" placeholder="Name">
-    <input type="password" id="password" placeholder="Password">
-    <button class="btn-action" onclick="handleAuth()">LOGIN / SIGNUP</button>
-  </div>
-</div>
-
-<div id="recharge-screen" class="hidden">
-    <div class="auth-card" style="border-color:var(--gold)">
-      <h2 style="color:var(--gold)">RECHARGE</h2>
-      <p style="font-size:12px">Low Balance!</p>
-      <button class="btn-action" style="background:#1f6feb" onclick="recharge(100)">₹100 (100 Bets)</button>
-      <button class="btn-action" style="background:#238636" onclick="recharge(500)">₹500 (520 Bets)</button>
-      <button onclick="document.getElementById('recharge-screen').classList.add('hidden')" style="background:none; border:none; color:grey; margin-top:15px">Close</button>
-    </div>
-</div>
-
-<div class="container hidden" id="app-interface">
-  <div class="user-info">
-    <div>
-      <div id="user-display" style="font-weight:bold; color:var(--neon); font-size:14px">USER</div>
-      <div id="balance-display" style="color:var(--gold); font-size:12px">Bets: 0</div>
-    </div>
-    <button onclick="document.getElementById('recharge-screen').classList.remove('hidden')" style="background:var(--gold); color:black; border:none; padding:5px 10px; border-radius:5px; font-weight:bold; font-size:10px">RECHARGE</button>
-  </div>
-
-  <div class="header">SUPER PREDICTOR PRO</div>
+<div class="container">
+  <div class="header">SUPER PREDICTOR</div>
 
   <div class="status-bar">
     <div>
-      <div style="font-size: 8px; color: #8b949e;">PERIOD</div>
-      <div id="current-period" style="font-size: 14px; font-weight: bold;">---</div>
+      <div style="font-size: 9px; color: #8b949e; letter-spacing: 1px;">PERIOD SYNC</div>
+      <div id="current-period" style="font-size: 15px; font-weight: 700; color: #fff;">---</div>
     </div>
     <div id="timer">00:00</div>
   </div>
 
   <div class="main-display">
+    <div style="font-size: 11px; color: #8b949e; margin-bottom: 5px; letter-spacing: 2px;">AI PROBABILITY</div>
     <div id="prediction-text">READY</div>
-    <div id="strength-display" style="font-size:11px; margin-top:10px; color:#8b949e; letter-spacing:1px">STRENGTH: 0%</div>
   </div>
 
-  <div id="history-list"></div>
+  <div id="history-list" class="history-section"></div>
 
-  <button class="btn-action" onclick="processAI()">Generate AI Signal</button>
+  <button class="btn-action" onclick="processAI()">Generate Signal</button>
 </div>
 
 <script>
-  let currentUser = null;
   let historyData = new Array(20).fill(null);
-  let listMode = 0;
+  let listMode = 0; // 0: Close, 1: 10, 2: 20
   let lastPeriod = "";
 
   function vibrate(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
 
-  function handleAuth() {
-    const name = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
-    if(!name || !pass) return alert("All fields required");
-
-    let user = JSON.parse(localStorage.getItem(name));
-    if(!user) {
-      user = { name, pass, balance: 0 };
-      localStorage.setItem(name, JSON.stringify(user));
-    } else if(user.pass !== pass) return alert("Wrong Password");
-
-    currentUser = user;
-    document.getElementById('auth-screen').classList.add('hidden');
-    document.getElementById('app-interface').classList.remove('hidden');
-    updateUI();
-    renderRows();
-    setInterval(syncTimer, 1000);
-  }
-
-  function updateUI() {
-    document.getElementById('user-display').innerText = currentUser.name.toUpperCase();
-    document.getElementById('balance-display').innerText = "Bets: " + currentUser.balance;
-    localStorage.setItem(currentUser.name, JSON.stringify(currentUser));
-  }
-
-  function recharge(amt) {
-    currentUser.balance += (amt === 500) ? 520 : 100;
-    updateUI();
-    document.getElementById('recharge-screen').classList.add('hidden');
-    alert("Success!");
-  }
-
-  function syncTimer() {
+  function syncEngine() {
     const now = new Date();
-    const sec = now.getUTCSeconds();
-    const dateStr = now.getUTCFullYear().toString() + (now.getUTCMonth() + 1).toString().padStart(2, '0') + now.getUTCDate().toString().padStart(2, '0');
-    const currentP = dateStr + "1000" + (10001 + (now.getUTCHours() * 60 + now.getUTCMinutes()));
+    const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+    const utcSec = now.getUTCSeconds();
+    
+    // Period Calculation
+    const dateStr = now.getUTCFullYear().toString() + 
+                    (now.getUTCMonth() + 1).toString().padStart(2, '0') + 
+                    now.getUTCDate().toString().padStart(2, '0');
+    const currentP = dateStr + "1000" + (10001 + utcMin);
 
+    // FIX: Data Shifting Logic
     if (currentP !== lastPeriod) {
-      if(lastPeriod !== "") {
-        for (let i = 19; i > 0; i--) { historyData[i] = historyData[i-1]; }
-        historyData[0] = null;
+      if (lastPeriod !== "") {
+        // Shift data: 1 goes to 2, 2 goes to 3...
+        for (let i = 19; i > 0; i--) {
+          historyData[i] = historyData[i - 1];
+        }
+        historyData[0] = null; // Clear Row 1 for new input
         renderRows();
+        vibrate(150);
       }
       lastPeriod = currentP;
       document.getElementById('current-period').innerText = currentP;
-      vibrate(100);
     }
-    document.getElementById('timer').innerText = "00:" + (59 - sec).toString().padStart(2, '0');
+
+    // Timer Update
+    const remaining = 59 - utcSec;
+    document.getElementById('timer').innerText = "00:" + remaining.toString().padStart(2, '0');
   }
 
   function renderRows() {
     const list = document.getElementById('history-list');
     list.innerHTML = "";
+    
     let limit = (listMode === 0) ? 1 : (listMode === 1 ? 10 : 20);
 
     for (let i = 0; i < limit; i++) {
       const row = document.createElement('div');
       row.className = `history-row`;
+      
       let btns = '';
-      for(let n=0; n<=9; n++) {
+      for (let n = 0; n <= 9; n++) {
         btns += `<div class="num-btn ${historyData[i] === n ? 'active' : ''}" onclick="setInput(${i}, ${n})">${n}</div>`;
       }
-      let clickAction = i === 0 ? `onclick="nav(1)"` : (i === 9 ? `onclick="nav(10)"` : "");
-      row.innerHTML = `<div class="circle-no" ${clickAction}>${i + 1}</div><div class="num-pad">${btns}</div>`;
+      
+      let navAction = "";
+      if (i === 0) navAction = `onclick="handleNav(1)"`;
+      if (i === 9) navAction = `onclick="handleNav(10)"`;
+
+      row.innerHTML = `<div class="circle-no" ${navAction}>${i + 1}</div><div class="num-pad">${btns}</div>`;
       list.appendChild(row);
     }
   }
 
-  function nav(t) {
+  function handleNav(val) {
     vibrate(40);
-    if(t === 1) listMode = (listMode === 0) ? 1 : 0;
-    else if(t === 10) listMode = (listMode === 1) ? 2 : 1;
+    if (val === 1) listMode = (listMode === 0) ? 1 : 0;
+    else if (val === 10) listMode = (listMode === 1) ? 2 : 1;
     renderRows();
   }
 
-  function setInput(i, v) { vibrate(30); historyData[i] = v; renderRows(); }
+  function setInput(idx, val) {
+    vibrate(30);
+    historyData[idx] = val;
+    renderRows();
+  }
 
-  // --- LOSS FIX AI LOGIC ---
   function processAI() {
-    if(currentUser.balance <= 0) return document.getElementById('recharge-screen').classList.remove('hidden');
-
     const filled = historyData.filter(v => v !== null);
-    if(filled.length < 5) return alert("कम से कम 5 नंबर भरें!");
+    if (filled.length < 5) { alert("कम से कम 5 पिछले नंबर भरें!"); return; }
 
-    currentUser.balance -= 1;
-    updateUI();
     vibrate([60, 40, 60]);
-
     const predEl = document.getElementById('prediction-text');
     predEl.classList.remove('result-glow');
     void predEl.offsetWidth;
     predEl.classList.add('result-glow');
 
-    // Advanced Trend Logic
-    const lastNum = filled[0];
-    let dragonCount = 0;
-    for(let i=0; i<4; i++) {
-        if((filled[i] > 4 && filled[i+1] > 4) || (filled[i] <= 4 && filled[i+1] <= 4)) dragonCount++;
-        else break;
-    }
-
-    let weightedSum = 0;
-    let totalW = 0;
-    filled.forEach((n, i) => {
-        let w = 10 / (i + 1);
-        weightedSum += n * w;
-        totalW += w;
-    });
-    const avg = weightedSum / totalW;
-
+    // High Precision Logic (Loss Fix)
+    const last3 = filled.slice(0, 3);
+    const avg = filled.reduce((a, b) => a + b, 0) / filled.length;
+    
     let decision = "";
     let color = "";
 
-    if(dragonCount >= 3) {
-        decision = (lastNum > 4) ? "SMALL" : "BIG"; // Counter trend logic
+    // Trend Detection
+    const isDragon = (last3[0] > 4 && last3[1] > 4 && last3[2] > 4) || (last3[0] < 5 && last3[1] < 5 && last3[2] < 5);
+
+    if (isDragon) {
+        decision = (last3[0] > 4) ? "SMALL" : "BIG"; // Trend reversal detection
     } else {
-        decision = (avg > 4.8) ? "BIG" : "SMALL";
+        decision = (avg > 4.5) ? "BIG" : "SMALL";
     }
-    
+
     color = (decision === "BIG") ? "var(--neon)" : "var(--gold)";
-    
-    // Low average safety
-    if(avg > 4 && avg < 6) {
-        decision = ([0,2,4,6,8].includes(lastNum)) ? "RED" : "GREEN";
+
+    // Force Color logic for high volatility
+    if (avg > 3.5 && avg < 5.5 && !isDragon) {
+        decision = ([0,2,4,6,8].includes(last3[0])) ? "RED" : "GREEN";
         color = (decision === "RED") ? "var(--red)" : "var(--green)";
     }
 
     predEl.innerText = decision;
     predEl.style.color = color;
-    document.getElementById('strength-display').innerText = "STRENGTH: " + (91 + Math.random() * 7).toFixed(1) + "%";
     
-    listMode = 0;
+    listMode = 0; // ऑटो क्लोज
     renderRows();
   }
+
+  setInterval(syncEngine, 1000);
+  syncEngine();
+  renderRows();
 </script>
 </body>
 </html>
