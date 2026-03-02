@@ -1,228 +1,140 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AI Predictor Pro Max</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Jalwa AI Predictor V2 - Accuracy Boost</title>
+    <style>
+        :root {
+            --bg: #060b19; --neon: #00f3ff; --gold: #ffcc00;
+            --red: #ff4d4d; --green: #2ecc71; --purple: #9b59b6;
+        }
+        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 420px; padding: 15px; box-sizing: border-box; }
+        
+        /* Prediction Display */
+        .header { text-align: center; color: var(--neon); font-weight: 900; font-size: 22px; margin-bottom: 20px; text-shadow: 0 0 10px var(--neon); }
+        .pred-card {
+            background: rgba(255,255,255,0.02); border: 2px solid var(--neon); border-radius: 20px;
+            padding: 30px 10px; text-align: center; margin-bottom: 20px; position: relative;
+        }
+        #result-display { font-size: 45px; font-weight: 900; color: #334155; transition: 0.5s; }
+        #confidence { font-size: 12px; color: var(--gold); margin-top: 10px; display: none; }
 
-    :root {
-      --neon: #00f3ff;
-      --bg: #010409;
-      --glass: rgba(255, 255, 255, 0.03);
-      --purple: #8a2be2;
-      --red: #ff3e3e;
-      --green: #00ff88;
-      --gold: #ffcc00;
-    }
+        /* History Table */
+        .history-row {
+            display: flex; align-items: center; background: rgba(255,255,255,0.03);
+            margin-bottom: 8px; padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(0,243,255,0.1);
+        }
+        .period-info { flex: 1; font-family: monospace; font-size: 13px; color: #94a3b8; }
+        .ball-group { display: flex; gap: 4px; }
+        .ball {
+            width: 25px; height: 25px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; cursor: pointer;
+        }
+        .ball.active { border-width: 2px; transform: scale(1.1); box-shadow: 0 0 10px white; }
+        .ball.red { border-color: var(--red); } .ball.green { border-color: var(--green); }
+        .ball.sel-red { background: var(--red); } .ball.sel-green { background: var(--green); }
 
-    body {
-      margin: 0; background: var(--bg); color: #e6edf3;
-      font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center;
-    }
-
-    .container {
-      width: 100%; max-width: 420px; min-height: 100vh;
-      padding: 20px 15px; box-sizing: border-box;
-      background: radial-gradient(circle at 50% 0%, #161b22 0%, #010409 100%);
-    }
-
-    .header {
-      text-align: center; font-family: 'Orbitron', sans-serif;
-      font-size: 22px; font-weight: 700; letter-spacing: 5px;
-      color: var(--neon); text-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
-      margin-bottom: 25px;
-    }
-
-    .status-bar {
-      display: flex; justify-content: space-between; align-items: center;
-      background: var(--glass); padding: 15px; border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.08); margin-bottom: 25px;
-    }
-
-    #timer { font-family: 'Orbitron', sans-serif; font-size: 28px; color: var(--gold); }
-
-    .main-display {
-      background: rgba(13, 17, 23, 0.8); border-radius: 24px;
-      padding: 50px 20px; text-align: center;
-      border: 1px solid rgba(0, 243, 255, 0.3);
-      box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.05);
-      margin-bottom: 25px; position: relative;
-    }
-
-    #prediction-text { 
-      font-family: 'Orbitron', sans-serif; font-size: 56px; font-weight: 700; 
-      color: #30363d; letter-spacing: 4px; transition: all 0.5s ease;
-    }
-
-    .result-glow { animation: proZoom 0.6s cubic-bezier(0.17, 0.89, 0.32, 1.28) forwards; }
-    @keyframes proZoom {
-      0% { transform: scale(0.6); opacity: 0; filter: blur(15px); }
-      100% { transform: scale(1); opacity: 1; filter: blur(0); text-shadow: 0 0 40px currentColor; }
-    }
-
-    .pulse { animation: softPulse 2s infinite; }
-    @keyframes softPulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-
-    .history-section { display: flex; flex-direction: column; gap: 10px; }
-    .history-row {
-      display: flex; align-items: center; gap: 10px;
-      background: var(--glass); padding: 8px 12px; border-radius: 50px;
-      border: 1px solid rgba(255,255,255,0.03); transition: 0.3s;
-    }
-
-    .circle-no {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--neon), var(--purple));
-      color: #000; display: flex; justify-content: center; align-items: center;
-      font-weight: 700; font-size: 14px; cursor: pointer; flex-shrink: 0;
-    }
-
-    .num-pad { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; }
-    .num-btn {
-      width: 28px; height: 28px; border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.1); color: #8b949e; 
-      font-size: 12px; display: flex; justify-content: center; align-items: center;
-    }
-    .num-btn.active { 
-      background: var(--neon); color: #000; border-color: var(--neon);
-      box-shadow: 0 0 12px var(--neon);
-    }
-
-    .btn-action {
-      width: 100%; padding: 20px; margin-top: 30px;
-      background: linear-gradient(135deg, var(--neon) 0%, var(--purple) 100%);
-      border: none; border-radius: 18px; color: white;
-      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
-      cursor: pointer; letter-spacing: 2px; text-transform: uppercase;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    }
-  </style>
+        .btn-predict {
+            width: 100%; padding: 18px; border: none; border-radius: 15px;
+            background: linear-gradient(90deg, #00f3ff, #bc13fe);
+            color: white; font-size: 18px; font-weight: 900; cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="header">AI PREDICTOR</div>
+    <div class="header">JALWA AI - PATTERN FIX</div>
 
-  <div class="status-bar">
-    <div>
-      <div style="font-size: 10px; color: #8b949e; letter-spacing: 2px;">PERIOD</div>
-      <div id="current-period" style="font-size: 18px; font-weight: 700;">---</div>
+    <div class="pred-card">
+        <div id="result-display">READY</div>
+        <div id="confidence">CONFIDENCE: <span id="conf-val">0</span>%</div>
     </div>
-    <div id="timer">00:00</div>
-  </div>
 
-  <div class="main-display">
-    <div style="font-size: 11px; color: #8b949e; margin-bottom: 8px; letter-spacing: 3px;">SIGNAL CONFIDENCE: <span id="strength" style="color:var(--neon)">0%</span></div>
-    <div id="prediction-text">READY</div>
-  </div>
+    <div id="history-box"></div>
 
-  <div id="history-list" class="history-section"></div>
-
-  <button class="btn-action" onclick="processAI()">Generate Signal</button>
+    <button class="btn-predict" onclick="analyzePatterns()">GET SMART PREDICTION</button>
 </div>
 
 <script>
-  let historyData = new Array(20).fill(null);
-  let listMode = 0; // 0: Hide, 1: 10 Rows, 2: 20 Rows
-  let lastPeriod = "";
+    let historyData = JSON.parse(localStorage.getItem('jalwa_smart_v2')) || new Array(10).fill(null);
+    let livePeriod = 0;
 
-  function vibrate(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+    function sync() {
+        const now = new Date();
+        const utcMins = now.getUTCHours() * 60 + now.getUTCMinutes();
+        const dateStr = now.getUTCFullYear().toString() + (now.getUTCMonth()+1).toString().padStart(2,'0') + now.getUTCDate().toString().padStart(2,'0');
+        const newPeriod = parseInt(dateStr + "1000" + (10001 + utcMins));
 
-  function syncTimer() {
-    const now = new Date();
-    const sec = now.getUTCSeconds();
-    const dateStr = now.getUTCFullYear().toString() + (now.getUTCMonth() + 1).toString().padStart(2, '0') + now.getUTCDate().toString().padStart(2, '0');
-    const currentP = dateStr + "1000" + (10001 + (now.getUTCHours() * 60 + now.getUTCMinutes()));
-
-    if (currentP !== lastPeriod) {
-      if(lastPeriod !== "") {
-        for (let i = 19; i > 0; i--) { historyData[i] = historyData[i-1]; }
-        historyData[0] = null;
-        renderRows();
-      }
-      lastPeriod = currentP;
-      document.getElementById('current-period').innerText = currentP;
-      vibrate(100);
-    }
-    document.getElementById('timer').innerText = "00:" + (59 - sec).toString().padStart(2, '0');
-  }
-
-  function renderRows() {
-    const list = document.getElementById('history-list');
-    list.innerHTML = "";
-    
-    let limit = 1;
-    if (listMode === 1) limit = 10;
-    if (listMode === 2) limit = 20;
-
-    for (let i = 0; i < limit; i++) {
-      const row = document.createElement('div');
-      row.className = `history-row`;
-      let btns = '';
-      for(let n=0; n<=9; n++) {
-        btns += `<div class="num-btn ${historyData[i] === n ? 'active' : ''}" onclick="setInput(${i}, ${n})">${n}</div>`;
-      }
-      
-      let clickAction = "";
-      if (i === 0) clickAction = `onclick="handleNav(1)"`; // Row 1 handles toggle
-      if (i === 9) clickAction = `onclick="handleNav(10)"`; // Row 10 handles expand to 20
-
-      row.innerHTML = `<div class="circle-no" ${clickAction}>${i + 1}</div><div class="num-pad">${btns}</div>`;
-      list.appendChild(row);
-    }
-  }
-
-  function handleNav(type) {
-    vibrate(40);
-    if (type === 1) {
-      // If closed, open 10. If open (any mode), close.
-      listMode = (listMode === 0) ? 1 : 0;
-    } else if (type === 10) {
-      // If 10 is open, expand to 20. If 20 is open, go back to 10.
-      listMode = (listMode === 1) ? 2 : 1;
-    }
-    renderRows();
-  }
-
-  function setInput(i, v) { vibrate(30); historyData[i] = v; renderRows(); }
-
-  function processAI() {
-    vibrate([60, 40, 60]);
-    const filled = historyData.filter(v => v !== null);
-    if(filled.length < 4) { alert("Please input at least 4 previous numbers."); return; }
-
-    const predEl = document.getElementById('prediction-text');
-    predEl.classList.remove('result-glow', 'pulse');
-    void predEl.offsetWidth;
-    predEl.classList.add('result-glow');
-
-    // Advanced Weighted Prediction
-    let score = 0;
-    filled.forEach((n, i) => { score += (n > 4 ? 1 : -1) * (10 / (i + 1)); });
-
-    let decision = score > 0 ? "BIG" : "SMALL";
-    let color = score > 0 ? "var(--neon)" : "var(--gold)";
-
-    // Color logic check
-    if (Math.abs(score) < 1.5) {
-       decision = (filled[0] % 2 === 0) ? "RED" : "GREEN";
-       color = (decision === "RED") ? "var(--red)" : "var(--green)";
+        if (livePeriod !== 0 && newPeriod > livePeriod) {
+            historyData.unshift(null);
+            historyData.pop();
+            save();
+        }
+        livePeriod = newPeriod;
+        render();
     }
 
-    predEl.innerText = decision;
-    predEl.style.color = color;
-    document.getElementById('strength').innerText = (85 + Math.random() * 14).toFixed(1) + "%";
+    function render() {
+        const box = document.getElementById('history-box');
+        box.innerHTML = '';
+        for (let i = 0; i < 10; i++) {
+            const rowP = livePeriod - (i + 1);
+            let ballsHtml = '';
+            for (let n = 0; n <= 9; n++) {
+                const isSelected = historyData[i] === n;
+                const color = (n % 2 === 0) ? 'red' : 'green';
+                const selClass = isSelected ? (color === 'red' ? 'sel-red active' : 'sel-green active') : '';
+                ballsHtml += `<div class="ball ${color} ${selClass}" onclick="setVal(${i}, ${n})">${n}</div>`;
+            }
+            box.innerHTML += `
+                <div class="history-row">
+                    <div class="period-info">...${rowP.toString().slice(-5)}</div>
+                    <div class="ball-group">${ballsHtml}</div>
+                </div>`;
+        }
+    }
 
-    setTimeout(() => predEl.classList.add('pulse'), 600);
-    listMode = 0;
-    renderRows();
-  }
+    function setVal(idx, val) { historyData[idx] = val; save(); render(); }
+    function save() { localStorage.setItem('jalwa_smart_v2', JSON.stringify(historyData)); }
 
-  setInterval(syncTimer, 1000);
-  syncTimer();
-  renderRows();
+    function analyzePatterns() {
+        const validData = historyData.filter(x => x !== null);
+        if (validData.length < 5) return alert("पैटर्न पकड़ने के लिए कम से कम 5 डेटा भरें!");
+
+        const display = document.getElementById('result-display');
+        const confBox = document.getElementById('confidence');
+        display.innerText = "ANALYZING...";
+        
+        setTimeout(() => {
+            // Logic 1: Last 3 Trend
+            const last3 = validData.slice(0, 3);
+            const isLastBig = last3.every(v => v >= 5);
+            const isLastSmall = last3.every(v => v < 5);
+
+            // Logic 2: Frequency
+            const bigCount = validData.filter(v => v >= 5).length;
+            const smallCount = validData.length - bigCount;
+
+            let finalRes = "";
+            let confidence = 0;
+
+            if (isLastBig) { finalRes = "SMALL"; confidence = 85; } // Break the streak
+            else if (isLastSmall) { finalRes = "BIG"; confidence = 85; }
+            else if (bigCount > smallCount) { finalRes = "SMALL"; confidence = 72; }
+            else { finalRes = "BIG"; confidence = 70; }
+
+            display.innerText = finalRes;
+            display.style.color = (finalRes === "BIG") ? "var(--neon)" : "var(--gold)";
+            confBox.style.display = "block";
+            document.getElementById('conf-val').innerText = confidence;
+        }, 1200);
+    }
+
+    setInterval(sync, 1000);
+    sync();
 </script>
 </body>
 </html>
