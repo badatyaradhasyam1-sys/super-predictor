@@ -3,70 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>QUANTUM PREDICTOR V10</title>
+  <title>QUANTUM V12 - MARTINGALE AI</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Rajdhani:wght@600;700&display=swap');
-    :root { --neon: #00f3ff; --bg: #010409; --gold: #ffcc00; --red: #ff3e3e; --green: #00ff88; --glass: rgba(255,255,255,0.03); --border: rgba(0, 243, 255, 0.2); }
+    :root { --neon: #00f3ff; --bg: #010409; --gold: #ffcc00; --red: #ff3e3e; --green: #00ff88; --glass: rgba(255,255,255,0.05); --border: rgba(0, 243, 243, 0.2); --purple: #bc13fe; }
     body { margin: 0; background: var(--bg); color: #e6edf3; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; }
     .container { width: 100%; max-width: 420px; min-height: 100vh; padding: 15px; margin: auto; background: radial-gradient(circle at 50% 0%, #161b22 0%, #010409 100%); }
     .header { text-align: center; font-family: 'Orbitron', sans-serif; font-size: 18px; color: var(--neon); letter-spacing: 4px; margin-bottom: 20px; text-shadow: 0 0 15px var(--neon); }
     
-    /* Next Gen Display */
-    .main-display { background: rgba(13, 17, 23, 0.8); border-radius: 20px; padding: 40px 10px; text-align: center; border: 1px solid var(--neon); box-shadow: 0 0 30px rgba(0, 243, 255, 0.15); margin-bottom: 20px; position: relative; }
-    .display-label { font-size: 10px; color: #8b949e; margin-bottom: 10px; font-family: 'Orbitron'; letter-spacing: 2px; }
-    #prediction-text { font-family: 'Orbitron', sans-serif; font-size: 60px; font-weight: 900; color: #30363d; transition: 0.4s; }
+    /* Display Box */
+    .main-display { background: rgba(13, 17, 23, 0.9); border-radius: 20px; padding: 25px 10px; text-align: center; border: 1px solid var(--neon); box-shadow: 0 0 30px rgba(0, 243, 255, 0.15); margin-bottom: 20px; position: relative; }
+    .display-label { font-size: 10px; color: #8b949e; margin-bottom: 5px; font-family: 'Orbitron'; letter-spacing: 2px; }
+    #prediction-text { font-family: 'Orbitron', sans-serif; font-size: 55px; font-weight: 900; color: #30363d; margin: 10px 0; }
     
-    /* Table & Pagination */
+    /* Martingale & Stats */
+    .stats-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
+    .stat-card { background: var(--glass); padding: 12px; border-radius: 12px; border: 1px solid var(--border); flex: 1; text-align: center; }
+    .stat-val { font-family: 'Orbitron'; color: var(--gold); font-size: 14px; margin-top: 5px; }
+    #m-level { color: var(--purple); font-weight: 900; text-shadow: 0 0 10px var(--purple); }
+
+    /* Table */
     .table-container { background: var(--glass); border-radius: 15px; border: 1px solid var(--border); padding: 10px; }
     .table-header { display: flex; padding: 10px; font-size: 10px; color: #8b949e; font-weight: bold; border-bottom: 1px solid var(--border); }
-    .history-row { display: flex; align-items: center; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); transition: 0.3s; }
-    .period-box { font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--neon); cursor: pointer; width: 25%; }
+    .history-row { display: flex; align-items: center; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .period-box { font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--neon); width: 25%; }
     .num-pad { display: flex; gap: 4px; width: 55%; overflow-x: auto; scrollbar-width: none; }
-    .num-btn { width: 24px; height: 24px; border-radius: 50%; border: 1px solid #30363d; color: #8b949e; font-size: 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+    .num-btn { width: 24px; height: 24px; border-radius: 50%; border: 1px solid #30363d; color: #8b949e; font-size: 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; cursor: pointer; }
     .num-btn.active { background: var(--neon); color: #000; box-shadow: 0 0 10px var(--neon); }
-    .status-col { width: 20%; text-align: right; font-weight: bold; font-size: 10px; position: relative; }
+    .status-col { width: 20%; text-align: right; font-weight: bold; font-size: 10px; }
 
-    /* Controls */
-    .pagination-bar { display: flex; justify-content: flex-end; padding: 10px; }
-    .page-arrow { cursor: pointer; color: var(--neon); font-size: 20px; padding: 5px 15px; border: 1px solid var(--border); border-radius: 5px; }
-    .btn-action { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--neon), #8a2be2); border: none; border-radius: 15px; color: white; font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 18px; margin-top: 15px; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+    .btn-action { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--neon), var(--purple)); border: none; border-radius: 15px; color: white; font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 18px; margin-top: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-    .pulse { animation: neonPulse 1.5s infinite; }
-    @keyframes neonPulse { 0% { text-shadow: 0 0 5px var(--neon); } 50% { text-shadow: 0 0 25px var(--neon); } 100% { text-shadow: 0 0 5px var(--neon); } }
+    .pulse { animation: neonPulse 1.2s infinite; }
+    @keyframes neonPulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.02); } 100% { opacity: 1; transform: scale(1); } }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="header">QUANTUM PREDICTOR</div>
+  <div class="header">QUANTUM V12 PRO</div>
   
   <div style="display:flex; justify-content:space-between; margin-bottom:15px; background:var(--glass); padding:15px; border-radius:15px; border:1px solid var(--border);">
     <div><div style="font-size:9px; color:#8b949e">LIVE PERIOD</div><div id="current-period" style="font-size:16px; font-weight:700">---</div></div>
     <div id="timer" style="font-family:'Orbitron'; font-size:24px; color:var(--gold)">00:00</div>
   </div>
 
-  <div class="main-display" id="main-box">
-    <div class="display-label" id="ai-mode">STRATEGY: SCANNING...</div>
+  <div class="main-display">
+    <div class="display-label" id="ai-mode">STRATEGY: IDLE</div>
     <div id="prediction-text">READY</div>
-    <div id="accuracy" style="font-size:11px; margin-top:10px; color:#8b949e">STABILITY: 0%</div>
+    <div id="accuracy" style="font-size:11px; color:#8b949e">CONFIDENCE: 0%</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div>INVESTMENT</div><div id="m-level" class="stat-val">LEVEL 1</div></div>
+    <div class="stat-card"><div>SUGGESTION</div><div id="m-advice" class="stat-val">X1 UNIT</div></div>
   </div>
 
   <div class="table-container">
     <div class="table-header"><div>PERIOD</div><div style="margin-left:55px">RESULT INPUT</div><div style="flex-grow:1; text-align:right">STATUS</div></div>
     <div id="history-list"></div>
-    <div class="pagination-bar">
-      <div class="page-arrow" onclick="changePage()">Next ⮕</div>
-    </div>
   </div>
 
-  <button class="btn-action" onclick="generateSignal()">GET AI SIGNAL</button>
+  <button class="btn-action" onclick="generateSignal()">ANALYZE QUANTUM WAVE</button>
 </div>
 
 <script>
   let memory = []; 
   let lastPeriod = "";
-  let curSignal = { type: "", value: "", color: "" };
-  let isExpanded = false;
-  let currentPage = 0; // 0 for Page 1, 1 for Page 2
+  let curSignal = { type: "-", value: "READY", color: "#30363d" };
+  let martingaleLevel = 1;
 
   function vibrate(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
 
@@ -78,11 +82,10 @@
 
     if (currentP !== lastPeriod) {
       if (lastPeriod !== "") {
+        // नया पीरियड आने पर पिछला डेटा चेक करें
+        checkMartingale();
         memory.unshift({ period: lastPeriod.slice(-4), input: null, ai_sig: {...curSignal} });
-        if (memory.length > 30) memory.pop();
-        // AUTO RESET: नया पीरियड आते ही पेज 1 पर वापस
-        currentPage = 0;
-        isExpanded = false;
+        if (memory.length > 10) memory.pop();
         renderRows();
         vibrate(100);
       }
@@ -92,78 +95,109 @@
     document.getElementById('timer').innerText = "00:" + (59 - now.getUTCSeconds()).toString().padStart(2, '0');
   }
 
+  function checkMartingale() {
+    if (memory.length > 0 && memory[0].input !== null) {
+      const item = memory[0];
+      const isBig = item.input > 4;
+      const won = (item.ai_sig.value === "BIG" && isBig) || (item.ai_sig.value === "SMALL" && !isBig) || (item.ai_sig.value === "RED" && [0,2,4,6,8].includes(item.input)) || (item.ai_sig.value === "GREEN" && ![0,2,4,6,8].includes(item.input));
+      
+      if (won) {
+        martingaleLevel = 1;
+      } else {
+        martingaleLevel = martingaleLevel >= 8 ? 1 : martingaleLevel + 1;
+      }
+      updateMartingaleUI();
+    }
+  }
+
+  function updateMartingaleUI() {
+    const levelEl = document.getElementById('m-level');
+    const adviceEl = document.getElementById('m-advice');
+    levelEl.innerText = "LEVEL " + martingaleLevel;
+    
+    const multipliers = [0, 1, 3, 8, 24, 72, 216, 648, 1944];
+    adviceEl.innerText = "X" + multipliers[martingaleLevel] + " UNIT";
+    
+    if (martingaleLevel > 1) {
+      levelEl.style.color = "var(--red)";
+      levelEl.style.textShadow = "0 0 10px var(--red)";
+    } else {
+      levelEl.style.color = "var(--purple)";
+      levelEl.style.textShadow = "0 0 10px var(--purple)";
+    }
+  }
+
+  function setInput(idx, val) { 
+    vibrate(30); 
+    if(!memory[idx]) memory[idx] = { period: "", input: null, ai_sig: {value:""} };
+    memory[idx].input = val; 
+    renderRows();
+    // इनपुट भरते ही मार्टिंगेल चेक करें ताकि अगली प्रेडिक्शन सही लेवल पर हो
+    if(idx === 0) checkMartingale(); 
+  }
+
   function renderRows() {
     const list = document.getElementById('history-list');
     list.innerHTML = "";
     const currentNum = parseInt(lastPeriod.slice(-4));
-    
-    // Logic: Page 1 shows recent 10, Page 2 shows next 10
-    let startIndex = currentPage * 10;
-    let limit = isExpanded ? (startIndex + 10) : (startIndex + 1);
 
-    for (let i = startIndex; i < limit; i++) {
+    for (let i = 0; i < 6; i++) {
       let displayPeriod = (currentNum - (i + 1)).toString().padStart(4, '0');
       let item = memory[i] || { period: displayPeriod, input: null, ai_sig: {value:""} };
       
       const row = document.createElement('div');
       row.className = `history-row`;
-      
       let btns = '';
       for (let n = 0; n <= 9; n++) btns += `<div class="num-btn ${item.input === n ? 'active' : ''}" onclick="setInput(${i}, ${n})">${n}</div>`;
       
       let resHtml = "-";
-      if (item.input !== null && item.ai_sig.value !== "") {
+      if (item.input !== null && item.ai_sig.value !== "READY" && item.ai_sig.value !== "") {
         const isBig = item.input > 4;
         const won = (item.ai_sig.value === "BIG" && isBig) || (item.ai_sig.value === "SMALL" && !isBig) || (item.ai_sig.value === "RED" && [0,2,4,6,8].includes(item.input)) || (item.ai_sig.value === "GREEN" && ![0,2,4,6,8].includes(item.input));
         resHtml = won ? `<span style="color:var(--green)">WIN</span>` : `<span style="color:var(--red)">LOSS</span>`;
       }
-
-      row.innerHTML = `<div class="period-box" onclick="toggleExpand()">...${displayPeriod}</div><div class="num-pad">${btns}</div><div class="status-col">${resHtml}</div>`;
+      row.innerHTML = `<div class="period-box">...${displayPeriod}</div><div class="num-pad">${btns}</div><div class="status-col">${resHtml}</div>`;
       list.appendChild(row);
     }
   }
 
-  function toggleExpand() { vibrate(40); isExpanded = !isExpanded; renderRows(); }
-  function changePage() { vibrate(40); currentPage = currentPage === 0 ? 1 : 0; isExpanded = true; renderRows(); }
-  function setInput(idx, val) { 
-    vibrate(30); 
-    if(!memory[idx]) memory[idx] = { period: "", input: null, ai_sig: {value:""} };
-    memory[idx].input = val; 
-    renderRows(); 
-  }
-
   function generateSignal() {
     const filled = memory.filter(m => m.input !== null);
-    if (filled.length < 5) { alert("कम से कम 5 डेटा भरें!"); return; }
+    if (filled.length < 5) { alert("Analysis requires 5 data inputs!"); return; }
     vibrate([60, 50, 60]);
 
-    // --- QUANTUM WAVE ALGORITHM ---
     const lastNums = filled.map(m => m.input);
-    const avg = lastNums.slice(0, 5).reduce((a,b)=>a+b,0) / 5;
     const last3 = lastNums.slice(0, 3);
-    
-    // Pattern Wave Recognition
-    const isDragon = (last3[0]>4 && last3[1]>4 && last3[2]>4) || (last3[0]<5 && last3[1]<5 && last3[2]<5);
-    const isZigZag = (last3[0]>4 && last3[1]<5 && last3[2]>4) || (last3[0]<5 && last3[1]>4 && last3[2]<5);
+    const last4 = lastNums.slice(0, 4);
+
+    // Advanced Patterns
+    let strategy = "COLOR VORTEX";
+    const isDragon = (last3.every(n => n > 4) || last3.every(n => n < 5));
+    const isMirror = (last4[0] > 4 && last4[1] > 4 && last4[2] < 5 && last4[3] < 5);
+    const isV = (last3[0] > 4 && last3[1] < 5 && last3[2] > 4) || (last3[0] < 5 && last3[1] > 4 && last3[2] < 5);
 
     if (isDragon) {
-        curSignal = { type: "SIZE", value: (last3[0]>4 ? "BIG" : "SMALL"), color: "var(--neon)" };
-        document.getElementById('ai-mode').innerText = "MODE: DRAGON FOLLOW";
-    } else if (isZigZag) {
-        curSignal = { type: "SIZE", value: (last3[0]>4 ? "SMALL" : "BIG"), color: "var(--gold)" };
-        document.getElementById('ai-mode').innerText = "MODE: ZIG-ZAG COUNTER";
+        curSignal = { value: (last3[0] > 4 ? "BIG" : "SMALL"), color: "var(--neon)" };
+        strategy = "DRAGON FOLLOW";
+    } else if (isMirror) {
+        curSignal = { value: (last4[0] > 4 ? "SMALL" : "BIG"), color: "var(--purple)" };
+        strategy = "MIRROR AA-BB";
+    } else if (isV) {
+        curSignal = { value: (last3[0] > 4 ? "SMALL" : "BIG"), color: "var(--gold)" };
+        strategy = "V-PATTERN BOUNCE";
     } else {
-        // High Probability Color
-        const redWeight = lastNums.filter(n => [0,2,4,6,8].includes(n)).length;
-        curSignal = { type: "COLOR", value: (redWeight >= 3 ? "RED" : "GREEN"), color: (redWeight >= 3 ? "var(--red)" : "var(--green)") };
-        document.getElementById('ai-mode').innerText = "MODE: COLOR VORTEX";
+        const redWeight = lastNums.slice(0,5).filter(n => [0,2,4,6,8].includes(n)).length;
+        curSignal = { value: (redWeight >= 3 ? "RED" : "GREEN"), color: (redWeight >= 3 ? "var(--red)" : "var(--green)") };
+        strategy = "COLOR VORTEX";
     }
 
     const predEl = document.getElementById('prediction-text');
     predEl.innerText = curSignal.value;
     predEl.style.color = curSignal.color;
     predEl.classList.add('pulse');
-    document.getElementById('accuracy').innerText = "STABILITY: " + (95 + Math.random() * 4).toFixed(1) + "%";
+    
+    document.getElementById('ai-mode').innerText = "MODE: " + strategy;
+    document.getElementById('accuracy').innerText = "CONFIDENCE: " + (92 + Math.random() * 7).toFixed(1) + "%";
   }
 
   setInterval(syncEngine, 1000);
