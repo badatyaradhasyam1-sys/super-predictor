@@ -62,21 +62,35 @@
 
   function vibrate(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
 
-  function syncEngine() {
+    function syncEngine() {
     const now = new Date();
-    const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
-    const dateStr = now.getUTCFullYear().toString() + (now.getUTCMonth() + 1).toString().padStart(2, '0') + now.getUTCDate().toString().padStart(2, '0');
-    const currentP = dateStr + "1000" + (10001 + utcMin);
+    const utcHours = now.getUTCHours();
+    const utcMinutes = now.getUTCMinutes();
+    const utcTotalMinutes = (utcHours * 60) + utcMinutes;
+    
+    const dateStr = now.getUTCFullYear().toString() + 
+                    (now.getUTCMonth() + 1).toString().padStart(2, '0') + 
+                    now.getUTCDate().toString().padStart(2, '0');
+    
+    // वर्तमान लाइव पीरियड
+    const currentP = dateStr + "1000" + (10001 + utcTotalMinutes);
 
     if (currentP !== lastPeriod) {
       if (lastPeriod !== "") {
-        memory.unshift({ period: lastPeriod.slice(-4), input: null, ai_sig: {...curSignal} });
+        // नया पीरियड आने पर पिछला डेटा मेमोरी में पुश करें
+        memory.unshift({ 
+          period: lastPeriod.slice(-4), 
+          input: null, 
+          ai_sig: {...curSignal} 
+        });
+        
         if (memory.length > 20) memory.pop();
-        renderRows();
         vibrate(100);
       }
       lastPeriod = currentP;
       document.getElementById('current-period').innerText = currentP;
+      // हर बार पीरियड बदलने पर रो को फिर से रेंडर करें ताकि नंबर फिक्स रहें
+      renderRows(); 
     }
     document.getElementById('timer').innerText = "00:" + (59 - now.getUTCSeconds()).toString().padStart(2, '0');
   }
@@ -84,14 +98,32 @@
   function renderRows() {
     const list = document.getElementById('history-list');
     list.innerHTML = "";
+    
+    // लाइव पीरियड नंबर को बेस मानें (जैसे 0400)
+    const currentNum = parseInt(lastPeriod.slice(-4));
+
+    // अगर मेमोरी खाली है (पहली बार लोड होने पर), तो डमी ढांचा बनाएं
+    if (memory.length === 0) {
+        for(let i=0; i<10; i++) {
+            memory.push({ period: (currentNum - (i+1)).toString().padStart(4, '0'), input: null, ai_sig: {type:"", value:""} });
+        }
+    }
+
     memory.forEach((item, idx) => {
+      // FIX: यहाँ हम जबरदस्ती सीक्वेंस (Sequence) बना रहे हैं
+      // यह लाइन सुनिश्चित करेगी कि 399 के बाद 398 ही आए, चाहे टाइमर कुछ भी कहे
+      let displayPeriod = (currentNum - (idx + 1)).toString().padStart(4, '0');
+      
       const row = document.createElement('div');
       row.className = `history-row`;
+      
       let btns = '';
-      for (let n = 0; n <= 9; n++) btns += `<div class="num-btn ${item.input === n ? 'active' : ''}" onclick="setInput(${idx}, ${n})">${n}</div>`;
+      for (let n = 0; n <= 9; n++) {
+        btns += `<div class="num-btn ${item.input === n ? 'active' : ''}" onclick="setInput(${idx}, ${n})">${n}</div>`;
+      }
       
       let resHtml = "-";
-      if (item.input !== null && item.ai_sig.value !== "") {
+      if (item.input !== null && item.ai_sig && item.ai_sig.value !== "") {
         let won = false;
         if (item.ai_sig.type === "SIZE") {
            won = (item.ai_sig.value === "BIG" && item.input > 4) || (item.ai_sig.value === "SMALL" && item.input < 5);
@@ -102,10 +134,15 @@
         resHtml = won ? `<span style="color:var(--green)">WIN</span>` : `<span style="color:var(--red)">LOSS</span>`;
       }
 
-      row.innerHTML = `<div class="col-p period-box">...${item.period}</div><div class="col-input num-pad">${btns}</div><div class="col-s" style="font-size:10px; font-weight:bold">${resHtml}</div>`;
+      row.innerHTML = `
+        <div class="col-p period-box">...${displayPeriod}</div>
+        <div class="col-i num-pad">${btns}</div>
+        <div class="col-s" style="font-size:10px; font-weight:bold">${resHtml}</div>
+      `;
       list.appendChild(row);
     });
   }
+
 
   function setInput(idx, val) { vibrate(30); memory[idx].input = val; renderRows(); }
 
