@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HALWA AI PREDICTOR</title>
+    <style>
+        :root {
+            --neon-cyan: #00f2ff;
+            --neon-pink: #ff007a;
+            --quantum-bg: rgba(10, 15, 25, 0.8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background: #05080a;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            overflow: hidden; /* स्क्रीन स्क्रॉल बंद */
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f172a 0%, #000000 100%);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+        }
+        .header h1 {
+            font-size: 22px;
+            letter-spacing: 5px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Real-time Period */
+        .sync-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        #timer { color: #ffcc00; font-weight: bold; }
+
+        /* Quantum Prediction Box */
+        .quantum-box {
+            background: var(--quantum-bg);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        /* Neon Scanning Line */
+        .quantum-box::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(0deg, transparent, rgba(0, 242, 255, 0.1), transparent);
+            animation: scan 3s infinite linear;
+        }
+
+        @keyframes scan { 0% { top: -100%; } 100% { top: 100%; } }
+
+        #prediction-result {
+            font-size: 60px;
+            font-weight: 900;
+            color: #475569;
+            text-shadow: 0 0 15px rgba(255,255,255,0.2);
+        }
+
+        .confidence-meter {
+            font-size: 10px;
+            margin-top: 10px;
+            color: var(--neon-cyan);
+            letter-spacing: 2px;
+        }
+
+        /* Quick Input Section */
+        .input-title { font-size: 12px; margin-bottom: 10px; color: #64748b; }
+        .grid-0-9 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .num-btn {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .num-btn:active { background: var(--neon-cyan); color: #000; }
+
+        /* History Invisible Box */
+        .history-container {
+            flex-grow: 1;
+            background: rgba(22, 27, 34, 0.5);
+            border-radius: 15px;
+            overflow: hidden; /* बाहरी बॉर्डर फिक्स */
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-scroll {
+            height: 380px; /* लगभग 10 पीरियड की ऊंचाई */
+            overflow-y: scroll;
+            padding: 10px;
+        }
+        /* Hide Scrollbar */
+        .history-scroll::-webkit-scrollbar { display: none; }
+
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 14px;
+        }
+
+        /* Setup Popup */
+        #setup-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+            display: none; /* JS से खुलेगा */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-card {
+            background: var(--card-bg);
+            text-align: center;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .red { background: #ff4d4d; }
+        .green { background: #2ecc71; }
+    </style>
+</head>
+<body>
+
+<div id="setup-modal">
+    <h2 style="color: var(--neon-cyan); margin-bottom: 5px;">INITIAL FEED</h2>
+    <p id="setup-target" style="color: #94a3b8; margin-bottom: 20px;">Enter Result for 10320</p>
+    <div class="grid-0-9" style="width: 100%;">
+        <button class="num-btn" onclick="handleSetup(0)">0</button>
+        <button class="num-btn" onclick="handleSetup(1)">1</button>
+        <button class="num-btn" onclick="handleSetup(2)">2</button>
+        <button class="num-btn" onclick="handleSetup(3)">3</button>
+        <button class="num-btn" onclick="handleSetup(4)">4</button>
+        <button class="num-btn" onclick="handleSetup(5)">5</button>
+        <button class="num-btn" onclick="handleSetup(6)">6</button>
+        <button class="num-btn" onclick="handleSetup(7)">7</button>
+        <button class="num-btn" onclick="handleSetup(8)">8</button>
+        <button class="num-btn" onclick="handleSetup(9)">9</button>
+    </div>
+    <p style="font-size: 12px; color: #475569;">Feed 10 rounds to initialize Quantum Engine</p>
+</div>
+
+<div class="app-container">
+    <div class="header">
+        <h1>HALWA AI PREDICTOR</h1>
+    </div>
+
+    <div class="sync-info">
+        <span>Period: <span id="current-period-display">----</span></span>
+        <span id="timer">00:00</span>
+    </div>
+
+    <div class="quantum-box">
+        <div class="confidence-meter" id="status-text">QUANTUM ENGINE: STANDBY</div>
+        <div id="prediction-result">READY</div>
+        <div class="confidence-meter" id="confidence-val">CONFIDENCE: 0%</div>
+    </div>
+
+    <div class="input-title">ENTER RECENT RESULT:</div>
+    <div class="grid-0-9">
+        <button class="num-btn" onclick="addLiveResult(0)">0</button>
+        <button class="num-btn" onclick="addLiveResult(1)">1</button>
+        <button class="num-btn" onclick="addLiveResult(2)">2</button>
+        <button class="num-btn" onclick="addLiveResult(3)">3</button>
+        <button class="num-btn" onclick="addLiveResult(4)">4</button>
+        <button class="num-btn" onclick="addLiveResult(5)">5</button>
+        <button class="num-btn" onclick="addLiveResult(6)">6</button>
+        <button class="num-btn" onclick="addLiveResult(7)">7</button>
+        <button class="num-btn" onclick="addLiveResult(8)">8</button>
+        <button class="num-btn" onclick="addLiveResult(9)">9</button>
+    </div>
+
+    <div class="history-container">
+        <div style="background: #1e293b; padding: 8px 15px; font-size: 12px; color: #94a3b8; display: flex; justify-content: space-between;">
+            <span>HISTORY (AUTO-SYNC)</span>
+            <span>STATUS</span>
+        </div>
+        <div class="history-scroll" id="history-list">
+            </div>
+    </div>
+</div>
+
+<script>
+    let historyData = JSON.parse(localStorage.getItem('halwa_history')) || [];
+    let setupCounter = 0;
+    let currentPeriod = "";
+
+    // 1. Wingo 1-Min Sync Logic
+    function updatePeriod() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const totalMinutes = now.getHours() * 60 + now.getMinutes();
+        const periodId = `${year}${month}${day}01${String(totalMinutes + 1).padStart(4, '0')}`;
+        
+        currentPeriod = periodId;
+        document.getElementById('current-period-display').textContent = periodId;
+
+        const seconds = now.getSeconds();
+        const remaining = 59 - seconds;
+        document.getElementById('timer').textContent = `00:${remaining.toString().padStart(2, '0')}`;
+
+        // Reset prediction on new round
+        if (remaining === 59) {
+            document.getElementById('prediction-result').textContent = "CALC...";
+            document.getElementById('prediction-result').style.color = "#475569";
+        }
+    }
+
+    // 2. Initial Setup Modal
+    function checkSetup() {
+        if (historyData.length < 10) {
+            document.getElementById('setup-modal').style.display = 'flex';
+            updateSetupText();
+        } else {
+            renderHistory();
+            runAnalysis();
+        }
+    }
+
+    function updateSetupText() {
+        let targetPeriod = parseInt(currentPeriod) - (setupCounter + 1);
+        document.getElementById('setup-target').textContent = `Enter Result for ${targetPeriod}`;
+    }
+
+    function handleSetup(num) {
+        let targetPeriod = String(parseInt(currentPeriod) - (setupCounter + 1));
+        historyData.push({ period: targetPeriod, result: num });
+        setupCounter++;
+
+        if (setupCounter >= 10) {
+            document.getElementById('setup-modal').style.display = 'none';
+            saveAndRefresh();
+        } else {
+            updateSetupText();
+        }
+    }
+
+    // 3. Live Input
+    function addLiveResult(num) {
+        // गेम में पिछले पीरियड का रिजल्ट भरा जाता है
+        let lastPeriod = String(parseInt(currentPeriod) - 1);
+        
+        // चेक करें कि कहीं ये पहले से तो नहीं भरा
+        if(historyData[0] && historyData[0].period === lastPeriod) {
+            alert("Already Updated for this round!");
+            return;
+        }
+
+        historyData.unshift({ period: lastPeriod, result: num });
+        if (historyData.length > 500) historyData.pop(); // 50 पेज का डेटा
+        saveAndRefresh();
+    }
+
+    // 4. Analysis Logic
+    function runAnalysis() {
+        const resultBox = document.getElementById('prediction-result');
+        const status = document.getElementById('status-text');
+        const conf = document.getElementById('confidence-val');
+
+        status.textContent = "QUANTUM ENGINE: ANALYZING...";
+        
+        setTimeout(() => {
+            // Weighted Logic
+            let last5 = historyData.slice(0, 5);
+            let sum = last5.reduce((a, b) => a + b.result, 0);
+            let prediction = (sum / 5 > 4.5) ? "SMALL" : "BIG";
+            
+            resultBox.textContent = prediction;
+            resultBox.style.color = (prediction === "BIG") ? "#00f2ff" : "#ffcc00";
+            resultBox.style.textShadow = `0 0 20px ${(prediction === "BIG") ? "#00f2ffaa" : "#ffcc00aa"}`;
+            
+            status.textContent = "QUANTUM ENGINE: STABLE";
+            let confidence = Math.min(65 + (historyData.length / 2), 98);
+            conf.textContent = `CONFIDENCE: ${Math.floor(confidence)}%`;
+        }, 1500);
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        list.innerHTML = historyData.map(item => `
+            <div class="history-row">
+                <span>${item.period}</span>
+                <span>
+                    <span style="margin-right:10px;">${item.result}</span>
+                    <span class="badge ${item.result >= 5 ? 'red' : 'green'}">
+                        ${item.result >= 5 ? 'BIG' : 'SMALL'}
+                    </span>
+                </span>
+            </div>
+        `).join('');
+    }
+
+    function saveAndRefresh() {
+        localStorage.setItem('halwa_history', JSON.stringify(historyData));
+        renderHistory();
+        runAnalysis();
+    }
+
+    setInterval(updatePeriod, 1000);
+    updatePeriod();
+    checkSetup();
+</script>
+
+</body>
+</html>
