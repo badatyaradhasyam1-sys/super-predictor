@@ -5,346 +5,252 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HALWA AI PREDICTOR</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap');
+
         :root {
             --neon-cyan: #00f2ff;
-            --neon-pink: #ff007a;
-            --quantum-bg: rgba(10, 15, 25, 0.8);
+            --neon-magenta: #ff00ff;
+            --bg-deep: #020617;
+            --glass: rgba(15, 23, 42, 0.8);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', sans-serif; }
+        body { background: var(--bg-deep); color: #fff; overflow: hidden; }
 
-        body {
-            background: #05080a;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            overflow: hidden; /* स्क्रीन स्क्रॉल बंद */
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 450px;
-            height: 100vh;
-            background: linear-gradient(180deg, #0f172a 0%, #000000 100%);
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            position: relative;
+        .app-shell {
+            width: 100%; max-width: 480px; height: 100vh; margin: auto;
+            background: radial-gradient(circle at top, #1e1b4b, #000);
+            display: flex; flex-direction: column; padding: 15px; position: relative;
         }
 
         /* Header */
-        .header {
-            text-align: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
-        }
-        .header h1 {
-            font-size: 22px;
-            letter-spacing: 5px;
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan);
-        }
+        .header { text-align: center; padding: 10px 0; border-bottom: 1px solid rgba(0, 242, 255, 0.1); }
+        .header h1 { font-size: 18px; letter-spacing: 4px; color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
 
-        /* Real-time Period */
-        .sync-info {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            font-size: 14px;
-            color: #94a3b8;
+        /* Jalwa Style Period Info */
+        .game-sync-card {
+            background: var(--glass); margin: 15px 0; padding: 15px; border-radius: 12px;
+            border-left: 4px solid var(--neon-cyan); display: flex; justify-content: space-between; align-items: center;
         }
-        #timer { color: #ffcc00; font-weight: bold; }
+        .period-box p { font-size: 10px; color: #94a3b8; margin-bottom: 5px; }
+        #period-no { font-size: 14px; font-weight: bold; color: #f8fafc; }
+        #timer { font-size: 24px; color: #fbbf24; font-weight: 900; }
 
-        /* Quantum Prediction Box */
-        .quantum-box {
-            background: var(--quantum-bg);
-            border: 1px solid var(--neon-cyan);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 25px rgba(0, 242, 255, 0.2);
-            margin-bottom: 20px;
+        /* Next-Gen Quantum Display */
+        .quantum-display {
+            background: rgba(0, 0, 0, 0.5); border: 1px solid var(--neon-cyan); border-radius: 25px;
+            padding: 40px 20px; text-align: center; position: relative; overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0, 242, 255, 0.1); margin-bottom: 20px;
         }
-        
-        /* Neon Scanning Line */
-        .quantum-box::after {
-            content: '';
-            position: absolute;
-            top: -100%;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(0deg, transparent, rgba(0, 242, 255, 0.1), transparent);
-            animation: scan 3s infinite linear;
+        .quantum-display::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan);
+            animation: scanning 2.5s infinite linear;
         }
+        @keyframes scanning { 0% { top: 0%; } 100% { top: 100%; } }
 
-        @keyframes scan { 0% { top: -100%; } 100% { top: 100%; } }
+        #prediction-text { font-size: 55px; font-weight: 900; color: #334155; transition: 0.5s; }
+        .engine-status { font-size: 9px; letter-spacing: 3px; color: var(--neon-cyan); margin-top: 15px; opacity: 0.6; }
 
-        #prediction-result {
-            font-size: 60px;
-            font-weight: 900;
-            color: #475569;
-            text-shadow: 0 0 15px rgba(255,255,255,0.2);
+        /* Rapid Keypad */
+        .input-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; }
+        .num-key {
+            padding: 15px 0; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; color: #fff; font-size: 18px; cursor: pointer; transition: 0.2s;
         }
+        .num-key:active { background: var(--neon-cyan); color: #000; transform: scale(0.9); }
 
-        .confidence-meter {
-            font-size: 10px;
-            margin-top: 10px;
-            color: var(--neon-cyan);
-            letter-spacing: 2px;
+        /* Invisible History Box */
+        .history-section { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .history-label { font-size: 10px; color: #475569; padding: 5px 0; border-bottom: 1px solid #1e293b; }
+        .scroll-container { 
+            overflow-y: auto; height: 350px; /* 10 राउंड फिक्स */
         }
+        .scroll-container::-webkit-scrollbar { display: none; }
+        .h-row { display: flex; justify-content: space-between; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 13px; }
 
-        /* Quick Input Section */
-        .input-title { font-size: 12px; margin-bottom: 10px; color: #64748b; }
-        .grid-0-9 {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+        /* Rapid Feed Popup */
+        #rapid-popup {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000;
+            display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
         }
-        .num-btn {
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: #fff;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .num-btn:active { background: var(--neon-cyan); color: #000; }
+        .popup-header { color: var(--neon-cyan); font-size: 14px; margin-bottom: 30px; text-align: center; }
 
-        /* History Invisible Box */
-        .history-container {
-            flex-grow: 1;
-            background: rgba(22, 27, 34, 0.5);
-            border-radius: 15px;
-            overflow: hidden; /* बाहरी बॉर्डर फिक्स */
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .history-scroll {
-            height: 380px; /* लगभग 10 पीरियड की ऊंचाई */
-            overflow-y: scroll;
-            padding: 10px;
-        }
-        /* Hide Scrollbar */
-        .history-scroll::-webkit-scrollbar { display: none; }
-
-        .history-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-size: 14px;
-        }
-
-        /* Setup Popup */
-        #setup-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 100;
-            display: none; /* JS से खुलेगा */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .modal-card {
-            background: var(--card-bg);
-            text-align: center;
-            width: 100%;
-            max-width: 350px;
-        }
-
-        .badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; }
-        .red { background: #ff4d4d; }
-        .green { background: #2ecc71; }
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+        .big { background: #ef4444; }
+        .small { background: #22c55e; }
     </style>
 </head>
 <body>
 
-<div id="setup-modal">
-    <h2 style="color: var(--neon-cyan); margin-bottom: 5px;">INITIAL FEED</h2>
-    <p id="setup-target" style="color: #94a3b8; margin-bottom: 20px;">Enter Result for 10320</p>
-    <div class="grid-0-9" style="width: 100%;">
-        <button class="num-btn" onclick="handleSetup(0)">0</button>
-        <button class="num-btn" onclick="handleSetup(1)">1</button>
-        <button class="num-btn" onclick="handleSetup(2)">2</button>
-        <button class="num-btn" onclick="handleSetup(3)">3</button>
-        <button class="num-btn" onclick="handleSetup(4)">4</button>
-        <button class="num-btn" onclick="handleSetup(5)">5</button>
-        <button class="num-btn" onclick="handleSetup(6)">6</button>
-        <button class="num-btn" onclick="handleSetup(7)">7</button>
-        <button class="num-btn" onclick="handleSetup(8)">8</button>
-        <button class="num-btn" onclick="handleSetup(9)">9</button>
+<div id="rapid-popup">
+    <div class="popup-header">
+        <p>INITIAL HISTORY FEED</p>
+        <h2 id="target-period" style="margin-top: 10px; color: #fbbf24;">Loading...</h2>
     </div>
-    <p style="font-size: 12px; color: #475569;">Feed 10 rounds to initialize Quantum Engine</p>
+    <div class="input-grid" style="width: 100%; max-width: 350px;">
+        <button class="num-key" onclick="handleRapidFeed(0)">0</button>
+        <button class="num-key" onclick="handleRapidFeed(1)">1</button>
+        <button class="num-key" onclick="handleRapidFeed(2)">2</button>
+        <button class="num-key" onclick="handleRapidFeed(3)">3</button>
+        <button class="num-key" onclick="handleRapidFeed(4)">4</button>
+        <button class="num-key" onclick="handleRapidFeed(5)">5</button>
+        <button class="num-key" onclick="handleRapidFeed(6)">6</button>
+        <button class="num-key" onclick="handleRapidFeed(7)">7</button>
+        <button class="num-key" onclick="handleRapidFeed(8)">8</button>
+        <button class="num-key" onclick="handleRapidFeed(9)">9</button>
+    </div>
+    <p style="font-size: 10px; color: #475569; margin-top: 20px;">FEED 10 ROUNDS TO UNLOCK QUANTUM ENGINE</p>
 </div>
 
-<div class="app-container">
-    <div class="header">
-        <h1>HALWA AI PREDICTOR</h1>
-    </div>
+<div class="app-shell">
+    <div class="header"><h1>HALWA AI PREDICTOR</h1></div>
 
-    <div class="sync-info">
-        <span>Period: <span id="current-period-display">----</span></span>
-        <span id="timer">00:00</span>
-    </div>
-
-    <div class="quantum-box">
-        <div class="confidence-meter" id="status-text">QUANTUM ENGINE: STANDBY</div>
-        <div id="prediction-result">READY</div>
-        <div class="confidence-meter" id="confidence-val">CONFIDENCE: 0%</div>
-    </div>
-
-    <div class="input-title">ENTER RECENT RESULT:</div>
-    <div class="grid-0-9">
-        <button class="num-btn" onclick="addLiveResult(0)">0</button>
-        <button class="num-btn" onclick="addLiveResult(1)">1</button>
-        <button class="num-btn" onclick="addLiveResult(2)">2</button>
-        <button class="num-btn" onclick="addLiveResult(3)">3</button>
-        <button class="num-btn" onclick="addLiveResult(4)">4</button>
-        <button class="num-btn" onclick="addLiveResult(5)">5</button>
-        <button class="num-btn" onclick="addLiveResult(6)">6</button>
-        <button class="num-btn" onclick="addLiveResult(7)">7</button>
-        <button class="num-btn" onclick="addLiveResult(8)">8</button>
-        <button class="num-btn" onclick="addLiveResult(9)">9</button>
-    </div>
-
-    <div class="history-container">
-        <div style="background: #1e293b; padding: 8px 15px; font-size: 12px; color: #94a3b8; display: flex; justify-content: space-between;">
-            <span>HISTORY (AUTO-SYNC)</span>
-            <span>STATUS</span>
+    <div class="game-sync-card">
+        <div class="period-box">
+            <p>WIN GO 1 MIN</p>
+            <div id="period-no">20260305100010000</div>
         </div>
-        <div class="history-scroll" id="history-list">
+        <div id="timer">00:00</div>
+    </div>
+
+    <div class="quantum-display">
+        <div id="prediction-text">LOCKED</div>
+        <div class="engine-status" id="engine-status">FEEDING DATA...</div>
+    </div>
+
+    <div class="input-grid">
+        <button class="num-key" onclick="liveAdd(0)">0</button>
+        <button class="num-key" onclick="liveAdd(1)">1</button>
+        <button class="num-key" onclick="liveAdd(2)">2</button>
+        <button class="num-key" onclick="liveAdd(3)">3</button>
+        <button class="num-key" onclick="liveAdd(4)">4</button>
+        <button class="num-key" onclick="liveAdd(5)">5</button>
+        <button class="num-key" onclick="liveAdd(6)">6</button>
+        <button class="num-key" onclick="liveAdd(7)">7</button>
+        <button class="num-key" onclick="liveAdd(8)">8</button>
+        <button class="num-key" onclick="liveAdd(9)">9</button>
+    </div>
+
+    <div class="history-section">
+        <div class="history-label">HISTORY RECOGNITION (INFINITE)</div>
+        <div class="scroll-container" id="history-list">
             </div>
     </div>
 </div>
 
 <script>
-    let historyData = JSON.parse(localStorage.getItem('halwa_history')) || [];
-    let setupCounter = 0;
+    let localDB = JSON.parse(localStorage.getItem('halwa_v3_db')) || [];
     let currentPeriod = "";
+    let feedCount = 0;
 
-    // 1. Wingo 1-Min Sync Logic
-    function updatePeriod() {
+    // --- 1. Jalwa Sync Logic (Exact Match) ---
+    function syncTime() {
         const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const totalMinutes = now.getHours() * 60 + now.getMinutes();
-        const periodId = `${year}${month}${day}01${String(totalMinutes + 1).padStart(4, '0')}`;
+        const YYYY = now.getFullYear();
+        const MM = String(now.getMonth() + 1).padStart(2, '0');
+        const DD = String(now.getDate()).padStart(2, '0');
         
-        currentPeriod = periodId;
-        document.getElementById('current-period-display').textContent = periodId;
-
-        const seconds = now.getSeconds();
-        const remaining = 59 - seconds;
-        document.getElementById('timer').textContent = `00:${remaining.toString().padStart(2, '0')}`;
-
-        // Reset prediction on new round
-        if (remaining === 59) {
-            document.getElementById('prediction-result').textContent = "CALC...";
-            document.getElementById('prediction-result').style.color = "#475569";
-        }
-    }
-
-    // 2. Initial Setup Modal
-    function checkSetup() {
-        if (historyData.length < 10) {
-            document.getElementById('setup-modal').style.display = 'flex';
-            updateSetupText();
-        } else {
-            renderHistory();
-            runAnalysis();
-        }
-    }
-
-    function updateSetupText() {
-        let targetPeriod = parseInt(currentPeriod) - (setupCounter + 1);
-        document.getElementById('setup-target').textContent = `Enter Result for ${targetPeriod}`;
-    }
-
-    function handleSetup(num) {
-        let targetPeriod = String(parseInt(currentPeriod) - (setupCounter + 1));
-        historyData.push({ period: targetPeriod, result: num });
-        setupCounter++;
-
-        if (setupCounter >= 10) {
-            document.getElementById('setup-modal').style.display = 'none';
-            saveAndRefresh();
-        } else {
-            updateSetupText();
-        }
-    }
-
-    // 3. Live Input
-    function addLiveResult(num) {
-        // गेम में पिछले पीरियड का रिजल्ट भरा जाता है
-        let lastPeriod = String(parseInt(currentPeriod) - 1);
+        // दिन के कुल मिनट (फोटो के फॉर्मेट के अनुसार)
+        const totalMin = now.getHours() * 60 + now.getMinutes();
         
-        // चेक करें कि कहीं ये पहले से तो नहीं भरा
-        if(historyData[0] && historyData[0].period === lastPeriod) {
-            alert("Already Updated for this round!");
-            return;
-        }
+        // Format: YYYYMMDD + 10001 + Sequence
+        currentPeriod = `${YYYY}${MM}${DD}10001${String(totalMin + 1).padStart(4, '0')}`;
+        document.getElementById('period-no').textContent = currentPeriod;
 
-        historyData.unshift({ period: lastPeriod, result: num });
-        if (historyData.length > 500) historyData.pop(); // 50 पेज का डेटा
-        saveAndRefresh();
+        const sec = now.getSeconds();
+        const rem = 59 - sec;
+        document.getElementById('timer').textContent = `00:${rem < 10 ? '0'+rem : rem}`;
+
+        if (rem === 59) {
+            document.getElementById('prediction-text').textContent = "SCAN...";
+            document.getElementById('prediction-text').style.color = "#334155";
+        }
     }
 
-    // 4. Analysis Logic
-    function runAnalysis() {
-        const resultBox = document.getElementById('prediction-result');
-        const status = document.getElementById('status-text');
-        const conf = document.getElementById('confidence-val');
+    // --- 2. Initial Rapid Feed Logic ---
+    function initApp() {
+        if (localDB.length < 10) {
+            document.getElementById('rapid-popup').style.display = 'flex';
+            updateFeedText();
+        } else {
+            refreshView();
+            runAI();
+        }
+    }
 
-        status.textContent = "QUANTUM ENGINE: ANALYZING...";
+    function updateFeedText() {
+        let prevP = String(BigInt(currentPeriod) - BigInt(feedCount + 1));
+        document.getElementById('target-period').textContent = `Round: ${prevP.slice(-4)}`;
+    }
+
+    function handleRapidFeed(num) {
+        let prevP = String(BigInt(currentPeriod) - BigInt(feedCount + 1));
+        localDB.push({ p: prevP, r: num });
+        feedCount++;
+
+        if (feedCount >= 10) {
+            document.getElementById('rapid-popup').style.display = 'none';
+            localDB.sort((a, b) => b.p - a.p);
+            saveData();
+        } else {
+            updateFeedText();
+        }
+    }
+
+    // --- 3. Live Keypad Input ---
+    function liveAdd(num) {
+        let lastP = String(BigInt(currentPeriod) - 1n);
+        if (localDB[0] && localDB[0].p === lastP) return; // Duplicate check
+
+        localDB.unshift({ p: lastP, r: num });
+        if (localDB.length > 500) localDB.pop(); // Save up to 500 rounds
+        saveData();
+    }
+
+    // --- 4. Quantum AI Engine ---
+    function runAI() {
+        const pred = document.getElementById('prediction-text');
+        const status = document.getElementById('engine-status');
+
+        status.textContent = "QUANTUM NEURAL SCANNING...";
         
         setTimeout(() => {
-            // Weighted Logic
-            let last5 = historyData.slice(0, 5);
-            let sum = last5.reduce((a, b) => a + b.result, 0);
-            let prediction = (sum / 5 > 4.5) ? "SMALL" : "BIG";
+            // Trend Logic: Based on last 10 rounds
+            let sum = localDB.slice(0, 10).reduce((a, b) => a + b.r, 0);
+            let avg = sum / 10;
             
-            resultBox.textContent = prediction;
-            resultBox.style.color = (prediction === "BIG") ? "#00f2ff" : "#ffcc00";
-            resultBox.style.textShadow = `0 0 20px ${(prediction === "BIG") ? "#00f2ffaa" : "#ffcc00aa"}`;
+            let result = (avg > 4.5) ? "SMALL" : "BIG"; // Counter-trend logic
             
-            status.textContent = "QUANTUM ENGINE: STABLE";
-            let confidence = Math.min(65 + (historyData.length / 2), 98);
-            conf.textContent = `CONFIDENCE: ${Math.floor(confidence)}%`;
-        }, 1500);
+            pred.textContent = result;
+            pred.style.color = (result === "BIG") ? "#ef4444" : "#22c55e";
+            pred.style.textShadow = `0 0 20px ${(result === "BIG") ? "#ef4444aa" : "#22c55eaa"}`;
+            status.textContent = "SYSTEM STABLE: ANALYSIS COMPLETE";
+        }, 1200);
     }
 
-    function renderHistory() {
+    function refreshView() {
         const list = document.getElementById('history-list');
-        list.innerHTML = historyData.map(item => `
-            <div class="history-row">
-                <span>${item.period}</span>
+        list.innerHTML = localDB.map(i => `
+            <div class="h-row">
+                <span style="color: #64748b;">${i.p}</span>
                 <span>
-                    <span style="margin-right:10px;">${item.result}</span>
-                    <span class="badge ${item.result >= 5 ? 'red' : 'green'}">
-                        ${item.result >= 5 ? 'BIG' : 'SMALL'}
-                    </span>
+                    <b style="margin-right: 15px;">${i.r}</b>
+                    <span class="badge ${i.r >= 5 ? 'big' : 'small'}">${i.r >= 5 ? 'B' : 'S'}</span>
                 </span>
             </div>
         `).join('');
+        runAI();
     }
 
-    function saveAndRefresh() {
-        localStorage.setItem('halwa_history', JSON.stringify(historyData));
-        renderHistory();
-        runAnalysis();
+    function saveData() {
+        localStorage.setItem('halwa_v3_db', JSON.stringify(localDB));
+        refreshView();
     }
 
-    setInterval(updatePeriod, 1000);
-    updatePeriod();
-    checkSetup();
+    setInterval(syncTime, 1000);
+    syncTime();
+    initApp();
 </script>
 
 </body>
