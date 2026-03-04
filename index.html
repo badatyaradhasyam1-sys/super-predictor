@@ -1,340 +1,170 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Predictor Pro</title>
+    <title>Quantum AI Predictor - Jalwa Edition</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Orbitron', sans-serif;
+        :root {
+            --bg: #0d1117;
+            --card: #161b22;
+            --accent: #58a6ff;
+            --green: #238636;
+            --red: #da3633;
+            --gold: #d29922;
         }
 
-        body {
-            background: radial-gradient(circle at top, #0f172a, #05080a);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #c9d1d9; margin: 0; padding: 15px; }
+        .container { max-width: 450px; margin: auto; }
+        
+        /* Glassmorphism Card */
+        .card {
+            background: var(--card);
+            border: 1px solid #30363d;
+            border-radius: 12px;
             padding: 20px;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 450px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Header Title */
-        .title {
-            text-align: center;
-            color: #00f2ff;
-            font-size: 22px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            text-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
-            margin-bottom: 10px;
-        }
-
-        /* Live Period Section */
-        .period-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            border-radius: 15px;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .period-info label {
-            display: block;
-            font-size: 10px;
-            color: #64748b;
-            margin-bottom: 5px;
-        }
-
-        .period-info span {
-            font-size: 16px;
-            color: #e2e8f0;
-            font-weight: bold;
-        }
-
-        #timer {
-            font-size: 28px;
-            color: #ffcc00;
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
-        }
-
-        /* Main Display Screen */
-        .display-screen {
-            background: rgba(15, 23, 42, 0.4);
-            border: 2px solid rgba(0, 242, 255, 0.3);
-            border-radius: 25px;
-            padding: 40px 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.1);
-        }
-
-        .strategy-label {
-            font-size: 12px;
-            color: #94a3b8;
-            letter-spacing: 2px;
             margin-bottom: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
 
-        #prediction-text {
-            font-size: 60px;
-            font-weight: 900;
-            color: #475569; /* Initial grey */
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            margin: 10px 0;
-            transition: all 0.5s ease;
-        }
+        h2 { color: var(--accent); font-size: 1.2rem; margin-top: 0; text-align: center; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
 
-        .stability-label {
-            font-size: 12px;
-            color: #64748b;
-        }
+        .input-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .input-group { flex: 1; }
+        label { display: block; font-size: 0.8rem; margin-bottom: 5px; color: #8b949e; }
+        input, select { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 6px; outline: none; }
 
-        /* Input & History Section */
-        .control-panel {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 15px;
-        }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-predict { background: var(--accent); color: white; margin-bottom: 10px; }
+        .btn-add { background: #30363d; color: white; }
 
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
+        .prediction-display { text-align: center; padding: 15px; background: #0d1117; border-radius: 8px; border: 1px dashed var(--accent); margin-top: 10px; }
+        .res-color { font-size: 24px; font-weight: 900; letter-spacing: 2px; }
 
-        input {
-            flex: 1;
-            background: #0f172a;
-            border: 1px solid #334155;
-            padding: 12px;
-            border-radius: 10px;
-            color: #00f2ff;
-            font-size: 18px;
-            text-align: center;
-            outline: none;
-        }
-
-        .next-btn {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid #334155;
-            color: #00f2ff;
-            padding: 0 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        /* Signal Button */
-        .signal-btn {
-            background: linear-gradient(90deg, #00d2ff 0%, #7000ff 100%);
-            border: none;
-            padding: 18px;
-            border-radius: 15px;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            box-shadow: 0 5px 20px rgba(112, 0, 255, 0.4);
-            transition: 0.3s;
-        }
-
-        .signal-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* History Table */
-        .history-container {
-            max-height: 150px;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-
-        th {
-            text-align: left;
-            padding: 8px;
-            color: #64748b;
-            border-bottom: 1px solid #334155;
-        }
-
-        td {
-            padding: 8px;
-            border-bottom: 1px solid #1e293b;
-        }
-
-        .badge {
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-        }
-
-        .msg-box {
-            text-align: center;
-            font-size: 12px;
-            height: 20px;
-        }
+        .martingale-box { background: rgba(210, 153, 34, 0.1); border: 1px solid var(--gold); padding: 10px; border-radius: 8px; margin-top: 15px; }
+        .history-list { font-size: 0.8rem; max-height: 120px; overflow-y: auto; }
+        .hist-item { display: flex; justify-content: space-between; padding: 5px; border-bottom: 1px solid #30363d; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <h1 class="title">Quantum Predictor</h1>
-
-    <div class="period-card">
-        <div class="period-info">
-            <label>LIVE PERIOD</label>
-            <span id="period-id">20260303100010971</span>
-        </div>
-        <div id="timer">00:10</div>
-    </div>
-
-    <div class="display-screen">
-        <div class="strategy-label" id="strategy-status">STRATEGY: SCANNING...</div>
-        <div id="prediction-text">READY</div>
-        <div class="stability-label">STABILITY: <span id="stability-percent">0%</span></div>
-    </div>
-
-    <div class="control-panel">
-        <div class="msg-box" id="msg"></div>
-        <div class="input-group">
-            <input type="number" id="num-input" placeholder="Enter Result" min="0" max="9">
-            <button class="next-btn" onclick="analyzeResult()">Next ➜</button>
-        </div>
+<div class="container">
+    <div class="card">
+        <h2>QUANTUM ANALYZER v3.0</h2>
         
-        <div class="history-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>PERIOD</th>
-                        <th>RESULT</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody id="history-body"></tbody>
-            </table>
+        <div class="input-row">
+            <div class="input-group">
+                <label>नंबर (0-9)</label>
+                <input type="number" id="lastNum" placeholder="Last Num">
+            </div>
+            <div class="input-group">
+                <label>साइज</label>
+                <select id="lastSize">
+                    <option value="BIG">BIG</option>
+                    <option value="SMALL">SMALL</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn btn-add" onclick="saveHistory()">+ डेटा जोड़ें (Add Data)</button>
+        <hr style="border:0.5px solid #30363d; margin: 15px 0;">
+        <button class="btn btn-predict" onclick="runQuantumLogic()">प्रेडिक्शन निकालें (Analyze)</button>
+
+        <div class="prediction-display" id="predictOutput" style="display:none;">
+            <div id="status" style="font-size: 0.7rem; color: #8b949e;">RESULT DETECTED:</div>
+            <div class="res-color" id="predColor">---</div>
+            <div id="predSize" style="font-weight: bold;">---</div>
         </div>
     </div>
 
-    <button class="signal-btn" onclick="generateSignal()">Get AI Signal</button>
+    <div class="card martingale-box">
+        <label>इन्वेस्टमेंट प्लान (Martingale):</label>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="number" id="baseAmount" value="10" style="width: 80px;">
+            <span id="martingalePath" style="font-size: 0.8rem; color: var(--gold);">Next Bet: ₹10</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <label>पैटर्न मेमोरी (History Logger):</label>
+        <div class="history-list" id="historyLog">
+            <p style="text-align:center; color:#555;">डेटा उपलब्ध नहीं है</p>
+        </div>
+    </div>
 </div>
 
 <script>
-    let historyData = [2, 7, 1, 9, 4, 8]; 
-    let currentPrediction = "";
+    let gameHistory = [];
+    let lossCount = 0;
 
-    const isBig = (n) => n >= 5;
-    const getColorName = (n) => {
-        if (n === 0) return "RED+VIO";
-        if (n === 5) return "GRN+VIO";
-        return [2, 4, 6, 8].includes(n) ? "RED" : "GREEN";
-    };
+    function saveHistory() {
+        const num = document.getElementById('lastNum').value;
+        const size = document.getElementById('lastSize').value;
+        if(num === "") return alert("नंबर डालें!");
 
-    function updateUI() {
-        const now = new Date();
-        const secs = now.getSeconds();
-        const countdown = 59 - secs;
-        document.getElementById('timer').textContent = `00:${countdown.toString().padStart(2, '0')}`;
+        const color = (num % 2 === 0) ? "RED" : "GREEN";
+        const entry = { num, size, color };
+        gameHistory.unshift(entry);
         
-        const periodBase = "2026030310001"; 
-        const periodId = periodBase + Math.floor((now.getHours() * 60 + now.getMinutes()));
-        document.getElementById('period-id').textContent = periodId;
+        updateHistoryUI();
+        document.getElementById('lastNum').value = "";
     }
 
-    function getBestPrediction() {
-        if (historyData.length < 3) return { text: "READY", color: "#475569", stab: "0%" };
-
-        let scores = { "BIG": 0, "SMALL": 0, "RED": 0, "GREEN": 0 };
-        const last3 = historyData.slice(-3);
-
-        // Trend logic
-        if (last3.every(isBig)) scores["BIG"] += 40;
-        else if (last3.every(n => !isBig(n))) scores["SMALL"] += 40;
-        else scores[Math.random() > 0.5 ? "BIG" : "SMALL"] += 20;
-
-        let best = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
-        let color = "#fff";
-        if (best === "BIG") color = "#00f2ff";
-        if (best === "SMALL") color = "#ffcc00";
-        if (best === "RED") color = "#ef4444";
-        if (best === "GREEN") color = "#22c55e";
-
-        currentPrediction = best;
-        return { text: best, color: color, stab: Math.floor(Math.random() * 30 + 65) + "%" };
+    function updateHistoryUI() {
+        const log = document.getElementById('historyLog');
+        log.innerHTML = gameHistory.map(h => `
+            <div class="hist-item">
+                <span>Num: ${h.num}</span>
+                <span style="color:${h.color === 'RED' ? '#da3633' : '#238636'}">${h.color}</span>
+                <span>${h.size}</span>
+            </div>
+        `).join('');
     }
 
-    function generateSignal() {
-        const status = document.getElementById('strategy-status');
-        const predBox = document.getElementById('prediction-text');
-        const stabBox = document.getElementById('stability-percent');
+    function runQuantumLogic() {
+        if(gameHistory.length < 1) return alert("पहले कम से कम 1 पिछला डेटा जोड़ें!");
 
-        status.textContent = "STRATEGY: ANALYZING...";
-        predBox.textContent = "WAIT";
-        predBox.style.color = "#64748b";
+        document.getElementById('predictOutput').style.display = 'block';
+        const last = gameHistory[0];
+        
+        // Quantum Logic: Pattern Recognition
+        let pColor = "";
+        let pSize = "";
 
-        setTimeout(() => {
-            const result = getBestPrediction();
-            status.textContent = "STRATEGY: ACTIVE";
-            predBox.textContent = result.text;
-            predBox.style.color = result.color;
-            predBox.style.textShadow = `0 0 20px ${result.color}aa`;
-            stabBox.textContent = result.stab;
-        }, 1500);
-    }
-
-    function analyzeResult() {
-        const input = document.getElementById('num-input');
-        const val = parseInt(input.value);
-        const msg = document.getElementById('msg');
-
-        if (isNaN(val) || val < 0 || val > 9) {
-            msg.textContent = "ENTER 0-9 ONLY!";
-            msg.style.color = "#ef4444";
-            return;
+        // लॉजिक 1: अगर पिछला नंबर 0 या 5 है (Violet), तो ट्रेंड पलटने की संभावना ज्यादा है
+        if(last.num == 0 || last.num == 5) {
+            pColor = (last.color === "RED") ? "GREEN" : "RED";
+            pSize = (last.size === "BIG") ? "SMALL" : "BIG";
+        } 
+        // लॉजिक 2: Dragon Trend (अगर लगातार 2 बार एक ही चीज आई है)
+        else if(gameHistory.length >= 2 && gameHistory[0].color === gameHistory[1].color) {
+            pColor = last.color; // Dragon continuation
+            pSize = last.size;
+        }
+        else {
+            // लॉजिक 3: Zig-Zag Pattern
+            pColor = (last.color === "RED") ? "GREEN" : "RED";
+            pSize = (last.size === "BIG") ? "SMALL" : "BIG";
         }
 
-        historyData.push(val);
-        const table = document.getElementById('history-body');
-        const row = table.insertRow(0);
-        const color = getColorName(val);
-        
-        row.innerHTML = `
-            <td>${Math.floor(Math.random()*9000+1000)}</td>
-            <td>${val}</td>
-            <td><span class="badge" style="background:#334155">${color}</span></td>
-        `;
+        // UI Update
+        const colorEl = document.getElementById('predColor');
+        colorEl.innerText = pColor;
+        colorEl.style.color = (pColor === "RED") ? "var(--red)" : "var(--green)";
+        document.getElementById('predSize').innerText = "PROBABLE: " + pSize;
 
-        msg.textContent = "DATA UPDATED";
-        msg.style.color = "#00f2ff";
-        input.value = "";
+        // Martingale Calculation
+        updateMartingale();
     }
 
-    setInterval(updateUI, 1000);
-    updateUI();
+    function updateMartingale() {
+        const base = parseInt(document.getElementById('baseAmount').value);
+        // हमने यहाँ 3x मेथड यूज़ किया है
+        const nextBet = base * Math.pow(3, lossCount);
+        document.getElementById('martingalePath').innerText = `Next Bet: ₹${nextBet} (Level ${lossCount + 1})`;
+        
+        // डेमो के लिए: आप इसे हारने पर बढ़ा सकते हैं। असली ऐप में यहाँ Win/Loss बटन होगा।
+    }
 </script>
 
 </body>
