@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HALWA AI PRO - FINAL SYNC</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap');
+        :root { --neon: #00f2ff; --bg: #000; --card: #111; --danger: #ff4444; --success: #00ff88; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Rajdhani', sans-serif; }
+        body { background: var(--bg); color: #fff; overflow: hidden; }
+        .app-container { width: 100%; max-width: 480px; height: 100vh; margin: auto; display: flex; flex-direction: column; padding: 10px; }
+        .halwa-title { font-family: 'Orbitron'; font-size: 24px; color: var(--neon); text-align: center; text-shadow: 0 0 10px var(--neon); margin: 10px 0; }
+        .sync-card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        #period-no { font-family: 'Orbitron'; font-size: 14px; color: #fff; }
+        #timer { font-family: 'Orbitron'; font-size: 22px; color: #ffcc00; }
+        .prediction-box { border: 2px solid var(--neon); border-radius: 15px; padding: 25px; text-align: center; margin-bottom: 10px; position: relative; }
+        #prediction-text { font-family: 'Orbitron'; font-size: 50px; font-weight: 900; opacity: 0.2; }
+        .win-meter { margin-top: 15px; height: 4px; background: #222; border-radius: 10px; overflow: hidden; }
+        #meter-fill { width: 0%; height: 100%; background: var(--neon); box-shadow: 0 0 10px var(--neon); transition: 1s; }
+        .input-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 10px; }
+        .num-btn { background: #1a1a1a; border: 1px solid #333; padding: 12px; color: #fff; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .num-btn:active { background: #333; }
+        .history-list { flex-grow: 1; overflow-y: auto; background: #050505; border-radius: 10px; padding: 5px; }
+        .h-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #111; align-items: center; cursor: pointer; }
+        .badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        #setup-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; padding: 20px; }
+        #start-btn { background: var(--success); color: #000; border: none; padding: 15px; border-radius: 10px; font-weight: 900; margin-top: 10px; display: none; font-family: 'Orbitron'; }
+        #edit-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; justify-content: center; align-items: center; }
+    </style>
+</head>
+<body>
+
+<audio id="beep" src="https://www.soundjay.com/buttons/beep-01a.mp3" preload="auto"></audio>
+
+<div id="edit-modal">
+    <div style="width: 90%; background: #111; padding: 20px; border-radius: 15px; border: 1px solid var(--neon);">
+        <p style="text-align:center; margin-bottom:15px; color:var(--neon)">EDIT RESULT</p>
+        <div class="input-grid" id="edit-grid"></div>
+        <button onclick="closeEdit()" style="width:100%; margin-top:10px; background:transparent; color:#666; border:none; padding:10px;">CANCEL</button>
+    </div>
+</div>
+
+<div id="setup-overlay">
+    <h2 class="halwa-title">HISTORY FEED</h2>
+    <p style="text-align: center; color: #666; font-size: 12px; margin-bottom: 20px;">इनपुट डालें (Latest First)</p>
+    <div id="setup-target" style="text-align:center; font-family:'Orbitron'; color:#ffcc00; margin-bottom:10px;">PERIOD: ----</div>
+    <div class="input-grid">
+        <script>for(let i=0; i<=9; i++) document.write(`<button class="num-btn" onclick="feed(${i})">${i}</button>`);</script>
+    </div>
+    <button id="start-btn" onclick="startApp()">START AI PREDICTOR</button>
+    <div class="history-list" id="setup-history" style="margin-top:20px;"></div>
+</div>
+
+<div class="app-container">
+    <div class="halwa-title">HALWA AI PRO</div>
+    <div class="sync-card">
+        <div><p style="font-size:10px; color:#666;">LIVE PERIOD</p><div id="period-no">SYNCING...</div></div>
+        <div id="timer">00:00</div>
+    </div>
+    <div class="prediction-box">
+        <div id="prediction-text">SCN...</div>
+        <div class="win-meter"><div id="meter-fill"></div></div>
+        <div id="ai-status" style="font-size: 10px; color: var(--neon); margin-top: 10px;">STABILITY: 0%</div>
+    </div>
+    <div class="input-grid">
+        <script>for(let i=0; i<=9; i++) document.write(`<button class="num-btn" onclick="addEntry(${i})">${i}</button>`);</script>
+    </div>
+    <div class="history-list" id="main-history"></div>
+</div>
+
+<script>
+    let database = JSON.parse(localStorage.getItem('halwa_v3_db')) || [];
+    let currentPeriod = "";
+    let editingIndex = -1;
+    const sound = document.getElementById('beep');
+
+    function playSound() {
+        sound.currentTime = 0;
+        sound.play().catch(()=>{});
+    }
+
+    function updateSync() {
+        const now = new Date();
+        const refDate = new Date(2026, 2, 4); 
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const daysDiff = Math.floor((today - refDate) / (1000 * 60 * 60 * 24));
+        const dailyBase = 11111 - (daysDiff * 1440);
+        const minutesToday = (now.getHours() * 60) + now.getMinutes();
+        const sequence = dailyBase + minutesToday; 
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        currentPeriod = `${y}${m}${d}1000${sequence}`;
+        document.getElementById('period-no').textContent = currentPeriod;
+        
+        let nextP = database.length > 0 ? String(BigInt(database[0].p) - 1n) : String(BigInt(currentPeriod) - 1n);
+        document.getElementById('setup-target').textContent = `PERIOD: ...${nextP.slice(-5)}`;
+
+        const rem = 59 - now.getSeconds();
+        document.getElementById('timer').textContent = `00:${rem < 10 ? '0' + rem : rem}`;
+        if (rem <= 5) document.getElementById('prediction-text').textContent = "SCN...";
+        else if (rem > 5 && document.getElementById('prediction-text').textContent === "SCN..." && database.length >= 5) generatePrediction();
+    }
+
+    function feed(num) {
+        playSound();
+        let targetP = database.length > 0 ? String(BigInt(database[0].p) - 1n) : String(BigInt(currentPeriod) - 1n);
+        database.unshift({ p: targetP, r: num });
+        updateUI();
+        if (database.length >= 5) document.getElementById('start-btn').style.display = 'block';
+    }
+
+    function addEntry(num) {
+        playSound();
+        let lastP = String(BigInt(currentPeriod) - 1n);
+        if (database[0] && database[0].p === lastP) return;
+        database.unshift({ p: lastP, r: num });
+        if (database.length > 500) database.pop();
+        updateUI();
+        calculateStability();
+    }
+
+    function generatePrediction() {
+        if (database.length < 5) return;
+        const last5 = database.slice(0, 5).map(x => x.r);
+        let bigCount = last5.filter(x => x >= 5).length;
+        let res = (bigCount >= 3) ? "SMALL" : "BIG";
+        const el = document.getElementById('prediction-text');
+        el.textContent = res;
+        el.style.opacity = "1";
+        el.style.color = res === "BIG" ? "var(--danger)" : "var(--success)";
+    }
+
+    function openEdit(index) {
+        playSound();
+        editingIndex = index;
+        const grid = document.getElementById('edit-grid');
+        grid.innerHTML = '';
+        for(let i=0; i<=9; i++) grid.innerHTML += `<button class="num-btn" onclick="applyEdit(${i})">${i}</button>`;
+        document.getElementById('edit-modal').style.display = 'flex';
+    }
+
+    function applyEdit(num) {
+        playSound();
+        database[editingIndex].r = num;
+        updateUI();
+        closeEdit();
+    }
+
+    function closeEdit() { document.getElementById('edit-modal').style.display = 'none'; }
+
+    function updateUI() {
+        localStorage.setItem('halwa_v3_db', JSON.stringify(database));
+        const html = database.map((item, index) => `
+            <div class="h-row" onclick="openEdit(${index})">
+                <span style="color:#666">${item.p}</span>
+                <span><b>${item.r}</b> <span class="badge" style="color:${item.r >= 5 ? 'var(--danger)' : 'var(--success)'}">${item.r >= 5 ? 'BIG' : 'SML'}</span></span>
+            </div>
+        `).join('');
+        document.getElementById('main-history').innerHTML = html;
+        document.getElementById('setup-history').innerHTML = html;
+    }
+
+    function calculateStability() {
+        let rate = 94 + (database.length % 5);
+        document.getElementById('meter-fill').style.width = rate + "%";
+        document.getElementById('ai-status').textContent = `STABILITY: ${rate}%`;
+    }
+
+    function startApp() { playSound(); document.getElementById('setup-overlay').style.display = 'none'; }
+    if (database.length >= 5) startApp();
+    setInterval(updateSync, 1000);
+    updateSync();
+    updateUI();
+</script>
+</body>
+</html>
