@@ -3,59 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HALWA AI PRO - SAFE MODE</title>
+    <title>HALWA AI PRO - FIXED INPUT</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap');
         :root { --neon: #00f2ff; --bg: #000; --card: #111; --danger: #ff4444; --success: #00ff88; --gold: #ffcc00; --violet: #b300ff; }
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Rajdhani', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: #fff; overflow: hidden; transition: background 0.5s; }
-        
-        /* Safe Mode Body Background */
+        body { background: var(--bg); color: #fff; overflow: hidden; transition: 0.5s; }
         body.safe-lock { background: #1a0f00; }
-
         .app-container { width: 100%; max-width: 480px; height: 100vh; margin: auto; display: flex; flex-direction: column; padding: 10px; }
-        .halwa-title { font-family: 'Orbitron'; font-size: 24px; color: var(--neon); text-align: center; text-shadow: 0 0 10px var(--neon); margin: 5px 0; }
+        .halwa-title { font-family: 'Orbitron'; font-size: 22px; color: var(--neon); text-align: center; text-shadow: 0 0 10px var(--neon); margin-bottom: 5px; }
         
-        .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+        .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
         .stat-card { background: #151515; padding: 5px; border-radius: 8px; text-align: center; border: 1px solid #222; }
-        .stat-label { font-size: 10px; color: #666; text-transform: uppercase; }
-        .stat-val { font-family: 'Orbitron'; font-size: 14px; color: var(--neon); }
+        .stat-label { font-size: 9px; color: #666; }
+        .stat-val { font-family: 'Orbitron'; font-size: 13px; color: var(--neon); }
 
         .sync-card { background: var(--card); padding: 10px; border-radius: 12px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         #period-no { font-family: 'Orbitron'; font-size: 13px; color: #fff; }
         #timer { font-family: 'Orbitron'; font-size: 20px; color: var(--gold); }
 
-        .prediction-box { position: relative; border: 1px solid rgba(0,242,255,0.2); background: rgba(255,255,255,0.01); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 8px; min-height: 140px; display: flex; flex-direction: column; justify-content: center; overflow: hidden; transition: 0.3s; }
+        .prediction-box { position: relative; border: 1px solid rgba(0,242,255,0.2); background: rgba(255,255,255,0.01); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 8px; min-height: 130px; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
         #prediction-text { font-family: 'Orbitron'; font-size: 42px; font-weight: 900; color: #333; z-index: 2; }
-        #color-prediction { font-family: 'Orbitron'; font-size: 20px; margin-top: 5px; font-weight: bold; z-index: 2; }
-        #martingale-tag { font-size: 12px; color: var(--gold); margin-top: 5px; font-weight: bold; }
+        #color-prediction { font-family: 'Orbitron'; font-size: 18px; margin-top: 5px; font-weight: bold; }
+        #martingale-tag { font-size: 11px; color: var(--gold); margin-top: 4px; }
         
-        /* Safe Mode Alert Styling */
-        .safe-lock .prediction-box { border-color: var(--gold); background: rgba(255, 204, 0, 0.05); }
-        .safe-lock #prediction-text { color: var(--gold) !important; font-size: 28px !important; }
-
         .scan-line { position: absolute; width: 100%; height: 2px; background: var(--neon); top: 0; left: 0; opacity: 0; }
-        .scanning .scan-line { animation: scan 1.5s infinite; opacity: 1; }
+        .scanning .scan-line { animation: scan 1.2s infinite; opacity: 1; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        .predict-btn { 
-            background: linear-gradient(135deg, #00f2ff, #0066ff); 
-            color: #000; border: none; padding: 12px; border-radius: 8px; font-family: 'Orbitron'; font-weight: 900; font-size: 16px; margin-bottom: 10px; cursor: pointer; box-shadow: 0 0 15px rgba(0, 242, 255, 0.4); text-transform: uppercase;
-        }
-        .predict-btn:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
+        .predict-btn { background: linear-gradient(135deg, #00f2ff, #0066ff); color: #000; border: none; padding: 12px; border-radius: 8px; font-family: 'Orbitron'; font-weight: 900; font-size: 15px; margin-bottom: 8px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 10px rgba(0,242,255,0.3); }
+        .predict-btn:disabled { opacity: 0.3; }
 
-        .keypad-container { margin-bottom: 8px; }
-        .grid-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-        .gap-target { display: flex; justify-content: space-between; padding: 0 5px; font-family: 'Orbitron'; color: #666; font-size: 10px; height: 20px; line-height: 20px; }
-        
+        .grid-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 5px; }
         .num-btn { background: #151515; border: 1px solid #252525; padding: 12px; color: #fff; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; }
         .num-btn:active { background: var(--neon); color: #000; }
 
-        .history-list { flex-grow: 1; overflow-y: auto; background: #050505; border-radius: 10px; padding: 5px; border: 1px solid #111; }
-        .h-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #111; align-items: center; }
-        .badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 5px; }
-        .win-tag { color: var(--success); font-weight: bold; }
-        .loss-tag { color: var(--danger); font-weight: bold; }
+        .history-list { flex-grow: 1; overflow-y: auto; background: #050505; border-radius: 10px; padding: 5px; border: 1px solid #111; font-size: 12px; }
+        .h-row { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #111; align-items: center; }
+        .badge { padding: 1px 6px; border-radius: 3px; font-size: 9px; font-weight: bold; margin-left: 4px; }
+        
+        .gap-info { display: flex; justify-content: space-between; padding: 2px 5px; font-size: 10px; color: #555; font-family: 'Orbitron'; }
     </style>
 </head>
 <body>
@@ -63,22 +50,22 @@
 <audio id="beep" src="https://www.soundjay.com/buttons/beep-01a.mp3" preload="auto"></audio>
 
 <div class="app-container">
-    <div class="halwa-title">HALWA AI <span style="color:var(--success)">SAFE-V10</span></div>
+    <div class="halwa-title">HALWA AI NEURAL <span id="v-tag" style="color:var(--success)">V10.1</span></div>
     
     <div class="stats-bar">
         <div class="stat-card"><div class="stat-label">WIN RATE</div><div id="win-rate" class="stat-val">0%</div></div>
-        <div class="stat-card"><div class="stat-label">WIN STREAK</div><div id="streak-val" class="stat-val">0</div></div>
-        <div class="stat-card"><div class="stat-label">AI ENGINE</div><div id="conf-val" class="stat-val">OFF</div></div>
+        <div class="stat-card"><div class="stat-label">STREAK</div><div id="streak-val" class="stat-val">0</div></div>
+        <div class="stat-card"><div class="stat-label">INPUTS</div><div id="input-count" class="stat-val">0/10</div></div>
     </div>
 
     <div class="sync-card">
-        <div><p style="font-size:9px; color:#555;">LIVE PERIOD</p><div id="period-no">SYNCING...</div></div>
+        <div><p style="font-size:8px; color:#444;">LIVE PERIOD</p><div id="period-no">SYNCING...</div></div>
         <div id="timer">00:00</div>
     </div>
 
     <div class="prediction-box" id="p-box">
         <div class="scan-line"></div>
-        <div id="prediction-text">READY</div>
+        <div id="prediction-text">WAITING...</div>
         <div id="color-prediction"></div>
         <div id="martingale-tag"></div>
     </div>
@@ -89,9 +76,9 @@
         <div class="grid-row">
             <script>for(let i=0; i<=4; i++) document.write(`<button class="num-btn" onclick="handleInput(${i})">${i}</button>`);</script>
         </div>
-        <div class="gap-target">
-            <span>TARGET: <b id="target-period-show" style="color:var(--gold)">---</b></span>
-            <span onclick="resetHistory()" style="color:var(--danger); cursor:pointer">RESET SYSTEM</span>
+        <div class="gap-info">
+            <span>INPUT TARGET: <b id="target-show" style="color:var(--gold)">---</b></span>
+            <span onclick="resetAI()" style="color:var(--danger); cursor:pointer">RESET MEMORY</span>
         </div>
         <div class="grid-row">
             <script>for(let i=5; i<=9; i++) document.write(`<button class="num-btn" onclick="handleInput(${i})">${i}</button>`);</script>
@@ -102,156 +89,134 @@
 </div>
 
 <script>
-    let database = JSON.parse(localStorage.getItem('halwa_safe_v10')) || [];
-    let lastPrediction = JSON.parse(localStorage.getItem('halwa_last_pred')) || null;
-    let mLevel = parseInt(localStorage.getItem('halwa_m_level')) || 1;
-    let winStreak = parseInt(localStorage.getItem('halwa_streak')) || 0;
-    let currentPeriod = "";
-    let targetPeriod = "";
+    let database = JSON.parse(localStorage.getItem('halwa_v10_fix')) || [];
+    let lastPred = JSON.parse(localStorage.getItem('halwa_last_p')) || null;
+    let mLevel = parseInt(localStorage.getItem('halwa_m_lvl')) || 1;
+    let winStreak = parseInt(localStorage.getItem('halwa_strk')) || 0;
+    let currentLivePeriod = "";
+    let manualTargetPeriod = "";
 
     function playSound() { document.getElementById('beep').currentTime = 0; document.getElementById('beep').play().catch(()=>{}); }
 
-    function resetHistory() {
-        if (confirm("Reset AI? यह आपकी स्ट्रैक और हिस्ट्री साफ़ कर देगा।")) { 
-            localStorage.clear(); 
-            location.reload(); 
-        }
-    }
+    function resetAI() { if(confirm("साफ करें?")) { localStorage.clear(); location.reload(); } }
 
-    function updateSync() {
+    function updateClock() {
         const now = new Date();
-        const y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0'), d = String(now.getDate()).padStart(2, '0');
+        const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
         const ref = new Date(2026, 2, 4);
         const days = Math.floor((new Date(y, now.getMonth(), d) - ref) / 86400000);
         const seq = (11111 - (days * 1440)) + (now.getHours() * 60) + now.getMinutes();
-        currentPeriod = `${y}${m}${d}1000${seq}`;
-        document.getElementById('period-no').textContent = currentPeriod;
+        currentLivePeriod = `${y}${m}${d}1000${seq}`;
+        document.getElementById('period-no').textContent = currentLivePeriod;
         
-        targetPeriod = String(BigInt(currentPeriod) - 1n);
-        if(database.length > 0 && database[0].p === targetPeriod) { targetPeriod = currentPeriod; }
-        document.getElementById('target-period-show').textContent = targetPeriod.slice(-4);
+        // --- FIXED TARGET LOGIC ---
+        // अगर डेटाबेस खाली है, तो पिछला पीरियड दिखाओ। 
+        // अगर भरा है, तो सबसे पुराने के नीचे वाला दिखाओ ताकि लाइन से 10 भर सकें।
+        if(database.length === 0) {
+            manualTargetPeriod = String(BigInt(currentLivePeriod) - 1n);
+        } else {
+            // सबसे पुराने पीरियड से एक कम वाला टारगेट सेट करें ताकि यूजर लगातार पीछे का डेटा भर सके
+            let oldest = database[database.length - 1].p;
+            let newest = database[0].p;
+            
+            // अगर ताज़ा पीरियड अभी नहीं भरा है, तो उसे भरें, वरना पीछे का भरें
+            let lastPeriod = String(BigInt(currentLivePeriod) - 1n);
+            if(!database.some(x => x.p === lastPeriod)) {
+                manualTargetPeriod = lastPeriod;
+            } else {
+                manualTargetPeriod = String(BigInt(oldest) - 1n);
+            }
+        }
+        document.getElementById('target-show').textContent = manualTargetPeriod.slice(-4);
 
         const rem = 59 - now.getSeconds();
-        document.getElementById('timer').textContent = `00:${rem < 10 ? '0' + rem : rem}`;
+        document.getElementById('timer').textContent = `00:${rem < 10 ? '0'+rem : rem}`;
         
-        // Safe Mode Check (Every Second)
-        checkSafeModeStatus();
-    }
-
-    function checkSafeModeStatus() {
         if(winStreak >= 5) {
             document.body.classList.add('safe-lock');
             document.getElementById('main-predict-btn').disabled = true;
-            document.getElementById('prediction-text').textContent = "TAKE A BREAK";
-            document.getElementById('prediction-text').style.color = "var(--gold)";
-            document.getElementById('color-prediction').textContent = "SAFE MODE ACTIVE";
-            document.getElementById('martingale-tag').textContent = "5+ WINS: पैटर्न रिस्क पर है!";
+            document.getElementById('prediction-text').textContent = "BREAK TIME";
         }
     }
 
     function handleInput(num) {
         playSound();
-        if (database.some(x => x.p === targetPeriod)) return;
+        // डुप्लीकेट चेक
+        if(database.some(x => x.p === manualTargetPeriod)) return;
 
-        let resObj = { p: targetPeriod, r: num, win: null };
+        let entry = { p: manualTargetPeriod, r: num, win: null };
         
-        if(lastPrediction && lastPrediction.period === targetPeriod) {
-            let isBig = num >= 5;
-            let predWasBig = lastPrediction.size === "BIG";
-            resObj.win = (isBig === predWasBig);
-            
-            if(resObj.win) { 
-                mLevel = 1; 
-                winStreak++;
-            } else { 
-                mLevel = mLevel < 5 ? mLevel + 1 : 1; 
-                winStreak = 0;
-            }
-            localStorage.setItem('halwa_m_level', mLevel);
-            localStorage.setItem('halwa_streak', winStreak);
+        // Win Tracker
+        if(lastPred && lastPred.period === manualTargetPeriod) {
+            entry.win = (num >= 5 === (lastPred.size === "BIG"));
+            if(entry.win) { mLevel = 1; winStreak++; } 
+            else { mLevel = mLevel < 5 ? mLevel+1 : 1; winStreak = 0; }
+            localStorage.setItem('halwa_m_lvl', mLevel);
+            localStorage.setItem('halwa_strk', winStreak);
         }
 
-        database.unshift(resObj);
-        database = database.slice(0, 50);
+        database.push(entry);
+        // सॉर्ट करें ताकि नया ऊपर रहे
+        database.sort((a,b) => BigInt(b.p) > BigInt(a.p) ? 1 : -1);
+        if(database.length > 50) database.pop();
+        
         updateUI();
     }
 
     function triggerNeuralPrediction() {
-        if (database.length < 10) { alert("कम से कम 10 डेटा इनपुट डालें!"); return; }
-        if (winStreak >= 5) return;
-        
+        if(database.length < 10) { alert("10 इनपुट चाहिए! अभी सिर्फ " + database.length + " हैं।"); return; }
         playSound();
         const box = document.getElementById('p-box');
         box.classList.add('scanning');
-        document.getElementById('prediction-text').textContent = "ANALYZING...";
-        document.getElementById('main-predict-btn').disabled = true;
-
+        document.getElementById('prediction-text').textContent = "DEEP SCAN...";
+        
         setTimeout(() => {
             box.classList.remove('scanning');
-            runNeuralEngine();
-        }, 1200);
-    }
-
-    function runNeuralEngine() {
-        const results = database.map(x => x.r).reverse();
-        const lastResult = results[results.length - 1];
-
-        // Deep Scan Logic
-        let seqMatch = null;
-        if(results.length > 5) {
+            const results = database.map(x => x.r).reverse();
+            const lastR = results[results.length-1];
+            
+            // AI Logic
+            let seqSize = null;
             let last3 = results.slice(-3).join(',');
-            for(let i=0; i < results.length - 4; i++) {
-                let sub = results.slice(i, i+3).join(',');
-                if(sub === last3) { seqMatch = results[i+3]; break; }
+            for(let i=0; i<results.length-4; i++) {
+                if(results.slice(i, i+3).join(',') === last3) { seqSize = results[i+3] >= 5 ? "BIG" : "SMALL"; break; }
             }
-        }
 
-        let transitions = {};
-        for (let i = 0; i < results.length - 1; i++) {
-            let cur = results[i], nxt = results[i + 1];
-            if (!transitions[cur]) transitions[cur] = [];
-            transitions[cur].push(nxt);
-        }
-        let nextPool = transitions[lastResult] || results;
-        let probBig = nextPool.filter(n => n >= 5).length / nextPool.length;
+            let finalS = seqSize || (results.filter(x => x>=5).length / results.length > 0.5 ? "BIG" : "SMALL");
+            let finalC = finalS === "BIG" ? "RED" : "GREEN";
 
-        let finalSize = (seqMatch !== null) ? (seqMatch >= 5 ? "BIG" : "SMALL") : (probBig >= 0.5 ? "BIG" : "SMALL");
-        let finalColor = (finalSize === "BIG") ? "RED" : "GREEN";
+            document.getElementById('prediction-text').textContent = finalS;
+            document.getElementById('prediction-text').style.color = finalS === "BIG" ? "var(--danger)" : "var(--success)";
+            document.getElementById('color-prediction').textContent = finalC;
+            document.getElementById('color-prediction').style.color = finalC === "RED" ? "var(--danger)" : "var(--success)";
+            document.getElementById('martingale-tag').textContent = "MARTINGALE: LEVEL " + mLevel;
+            document.getElementById('conf-val').textContent = seqSize ? "HIGH" : "MID";
 
-        document.getElementById('prediction-text').textContent = finalSize;
-        document.getElementById('prediction-text').style.color = finalSize === "BIG" ? "var(--danger)" : "var(--success)";
-        document.getElementById('color-prediction').textContent = finalColor;
-        document.getElementById('color-prediction').style.color = finalColor === "RED" ? "var(--danger)" : "var(--success)";
-        document.getElementById('martingale-tag').textContent = `RECOVERY LEVEL: ${mLevel}`;
-        document.getElementById('conf-val').textContent = (seqMatch !== null ? "DEEP" : "PROB");
-
-        lastPrediction = { period: currentPeriod, size: finalSize };
-        localStorage.setItem('halwa_last_pred', JSON.stringify(lastPrediction));
+            lastPred = { period: currentLivePeriod, size: finalS };
+            localStorage.setItem('halwa_last_p', JSON.stringify(lastPred));
+        }, 1000);
     }
 
     function updateUI() {
-        localStorage.setItem('halwa_safe_v10', JSON.stringify(database));
-        let wins = database.filter(x => x.win === true).length;
-        let total = database.filter(x => x.win !== null).length;
-        document.getElementById('win-rate').textContent = (total > 0 ? Math.round((wins / total) * 100) : 0) + "%";
+        localStorage.setItem('halwa_v10_fix', JSON.stringify(database));
+        document.getElementById('input-count').textContent = database.length + "/10";
         document.getElementById('streak-val').textContent = winStreak;
+        let winNodes = database.filter(x => x.win !== null);
+        let rate = winNodes.length ? Math.round((winNodes.filter(x => x.win).length / winNodes.length) * 100) : 0;
+        document.getElementById('win-rate').textContent = rate + "%";
 
-        document.getElementById('main-history').innerHTML = database.map(item => {
-            let isBig = item.r >= 5;
-            let winStatus = item.win === null ? "" : (item.win ? "<span class='win-tag'>W</span>" : "<span class='loss-tag'>L</span>");
-            return `
+        document.getElementById('main-history').innerHTML = database.map(item => `
             <div class="h-row">
-                <span style="color:#555; font-size:11px;">${item.p.slice(-4)} | ${winStatus}</span>
+                <span>${item.p.slice(-4)} | ${item.win === null ? "" : (item.win ? "<b style='color:var(--success)'>WIN</b>":"<b style='color:var(--danger)'>LOSS</b>")}</span>
                 <span>
                     <b style="color:${[1,3,7,9,5].includes(item.r)?'var(--success)':'var(--danger)'}">${item.r}</b>
-                    <span class="badge" style="background:${isBig?'#221111':'#112211'}; color:${isBig?'#ff4444':'#00ff88'}">${isBig?'BIG':'SML'}</span>
+                    <span class="badge" style="background:#222; color:#fff">${item.r>=5?'BIG':'SML'}</span>
                 </span>
-            </div>`;
-        }).join('');
+            </div>`).join('');
     }
 
-    setInterval(updateSync, 1000);
-    updateSync(); updateUI();
+    setInterval(updateClock, 1000);
+    updateClock(); updateUI();
 </script>
 </body>
 </html>
