@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HALWA AI - MIRROR PRO</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap');
+        :root { --neon: #00f2ff; --bg: #000; --card: #111; --danger: #ff4444; --success: #00ff88; --gold: #ffcc00; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Rajdhani', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: #fff; overflow: hidden; height: 100vh; }
+        
+        .app-container { width: 100%; max-width: 480px; height: 100vh; margin: auto; display: flex; flex-direction: column; padding: 10px; }
+        .halwa-title { font-family: 'Orbitron'; font-size: 22px; color: var(--neon); text-align: center; text-shadow: 0 0 10px var(--neon); margin-bottom: 5px; }
+        
+        /* Prediction Box */
+        .prediction-box { background: rgba(255,255,255,0.03); border: 1px solid #222; border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 10px; }
+        #res-size { font-family: 'Orbitron'; font-size: 32px; font-weight: 900; line-height: 1; }
+        .num-targets { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
+        .target-circle { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; color: var(--gold); font-weight: bold; font-size: 18px; }
+
+        .btn-predict { width: 100%; background: linear-gradient(90deg, #00f2ff, #0066ff); color: #000; border: none; padding: 10px; border-radius: 8px; font-family: 'Orbitron'; font-weight: 900; font-size: 14px; margin-bottom: 10px; cursor: pointer; }
+
+        /* Keypad with Center Period */
+        .keypad-section { background: #080808; padding: 10px; border-radius: 15px; border: 1px solid #151515; margin-bottom: 10px; }
+        .num-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .center-period-display { text-align: center; padding: 10px 0; color: var(--gold); font-family: 'Orbitron'; font-size: 18px; font-weight: bold; border-top: 1px solid #111; border-bottom: 1px solid #111; margin: 8px 0; }
+        .num-btn { background: #1a1a1a; border: 1px solid #333; padding: 12px; color: #fff; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; }
+        .num-btn:active { background: var(--neon); color: #000; }
+
+        /* Ghost History List */
+        .history-container { flex-grow: 1; overflow-y: auto; background: #050505; border-radius: 12px; border: 1px solid #111; position: relative; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #0f0f0f; }
+        .h-period { color: #555; font-size: 13px; font-family: 'Orbitron'; }
+        .h-res { font-weight: bold; font-size: 16px; }
+        .waiting { color: #222; font-style: italic; font-size: 12px; }
+
+        .timer-strip { display: flex; justify-content: space-between; font-size: 11px; color: #444; margin-bottom: 5px; padding: 0 5px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="halwa-title">HALWA AI - MIRROR</div>
+
+    <div class="timer-strip">
+        <span id="live-time">00:00:00</span>
+        <span id="next-timer" style="color:var(--gold)">NEXT IN: 00s</span>
+    </div>
+
+    <div class="prediction-box">
+        <div id="res-size" style="color:#222">READY</div>
+        <div class="num-targets" id="targets-ui">
+            <div class="target-circle">?</div>
+            <div class="target-circle">?</div>
+            <div class="target-circle">?</div>
+        </div>
+    </div>
+
+    <button class="btn-predict" onclick="runAnalysis()">GET PREDICTION</button>
+
+    <div class="keypad-section">
+        <div class="num-row">
+            <button class="num-btn" onclick="inputData(0)">0</button>
+            <button class="num-btn" onclick="inputData(1)">1</button>
+            <button class="num-btn" onclick="inputData(2)">2</button>
+            <button class="num-btn" onclick="inputData(3)">3</button>
+            <button class="num-btn" onclick="inputData(4)">4</button>
+        </div>
+        <div class="center-period-display" id="active-period">SYNCING...</div>
+        <div class="num-row">
+            <button class="num-btn" onclick="inputData(5)">5</button>
+            <button class="num-btn" onclick="inputData(6)">6</button>
+            <button class="num-btn" onclick="inputData(7)">7</button>
+            <button class="num-btn" onclick="inputData(8)">8</button>
+            <button class="num-btn" onclick="inputData(9)">9</button>
+        </div>
+    </div>
+
+    <div class="history-container" id="ghost-list">
+        </div>
+</div>
+
+<script>
+    let userInputs = JSON.parse(localStorage.getItem('halwa_mirror_data')) || {};
+    let currentPeriod = "";
+
+    function getLivePeriod() {
+        const now = new Date();
+        const y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0'), d = String(now.getDate()).padStart(2, '0');
+        // Simple period sequence based on minutes of the day
+        const seq = (now.getHours() * 60) + now.getMinutes() + 1000; 
+        return `${y}${m}${d}${seq}`;
+    }
+
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('live-time').textContent = now.toLocaleTimeString();
+        const seconds = now.getSeconds();
+        document.getElementById('next-timer').textContent = `NEXT IN: ${60 - seconds}s`;
+
+        let newP = getLivePeriod();
+        if (newP !== currentPeriod) {
+            currentPeriod = newP;
+            document.getElementById('active-period').textContent = currentPeriod;
+            renderHistory(); // Refresh list for new period
+        }
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('ghost-list');
+        let html = "";
+        let baseP = BigInt(currentPeriod);
+
+        // Generate 500 ghost periods (top is current, going backwards)
+        for (let i = 0; i < 500; i++) {
+            let pId = String(baseP - BigInt(i));
+            let result = userInputs[pId];
+            
+            html += `
+                <div class="history-item" style="${i === 0 ? 'background:rgba(0,242,255,0.05)' : ''}">
+                    <span class="h-period">${pId}</span>
+                    <span class="h-res">
+                        ${result !== undefined ? 
+                            `<b style="color:${result >= 5 ? 'var(--danger)' : 'var(--success)'}">${result} (${result >= 5 ? 'B' : 'S'})</b>` : 
+                            `<span class="waiting">WAITING...</span>`}
+                    </span>
+                </div>`;
+        }
+        list.innerHTML = html;
+    }
+
+    function inputData(num) {
+        userInputs[currentPeriod] = num;
+        localStorage.setItem('halwa_mirror_data', JSON.stringify(userInputs));
+        renderHistory();
+        // Visual feedback
+        document.getElementById('res-size').textContent = "DATA IN";
+        document.getElementById('res-size').style.color = "var(--gold)";
+    }
+
+    function runAnalysis() {
+        let results = Object.values(userInputs);
+        if (results.length < 5) { alert("कम से कम 5 डेटा डालें!"); return; }
+
+        // Number Frequency Logic (Top 3)
+        let lastValue = results[results.length - 1];
+        let freq = {};
+        results.forEach(v => freq[v] = (freq[v] || 0) + 1);
+        
+        let sorted = Object.keys(freq).sort((a,b) => freq[b] - freq[a]);
+        let top3 = sorted.slice(0, 3);
+        
+        // Fill if not enough
+        while(top3.length < 3) top3.push(Math.floor(Math.random()*10));
+
+        // Size logic based on weighted average of top 3
+        let sum = top3.reduce((a,b) => Number(a) + Number(b), 0);
+        let finalSize = (sum / 3) >= 5 ? "BIG" : "SMALL";
+
+        // UI Update
+        const sizeEl = document.getElementById('res-size');
+        sizeEl.textContent = finalSize;
+        sizeEl.style.color = finalSize === "BIG" ? "var(--danger)" : "var(--success)";
+
+        document.getElementById('targets-ui').innerHTML = top3.map(n => `<div class="target-circle">${n}</div>`).join('');
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+    renderHistory();
+</script>
+
+</body>
+</html>
