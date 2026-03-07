@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HALWA AI - HYPER FAST</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap');
+        :root { --neon: #00f2ff; --bg: #000; --card: #111; --danger: #ff4444; --success: #00ff88; --gold: #ffcc00; --violet: #b300ff; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Rajdhani', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: #fff; overflow: hidden; height: 100vh; }
+        
+        .app-container { width: 100%; max-width: 480px; height: 100vh; margin: auto; display: flex; flex-direction: column; padding: 10px; }
+        
+        /* Prediction Header */
+        .pred-header { background: linear-gradient(180deg, #1a1a1a, #000); border: 1px solid #333; border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 15px; box-shadow: 0 0 20px rgba(0,242,255,0.1); }
+        .target-label { font-size: 10px; color: var(--gold); letter-spacing: 2px; margin-bottom: 5px; }
+        #target-period { font-family: 'Orbitron'; font-size: 18px; color: #fff; text-shadow: 0 0 5px var(--neon); }
+        #main-res { font-family: 'Orbitron'; font-size: 45px; font-weight: 900; margin: 5px 0; color: #222; }
+        .suggested-nums { display: flex; justify-content: center; gap: 10px; }
+        .s-num { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--gold); font-family: 'Orbitron'; }
+
+        /* History List */
+        .history-label { font-size: 12px; color: #555; margin-bottom: 5px; padding-left: 5px; display: flex; justify-content: space-between; }
+        .history-scroll { flex-grow: 1; overflow-y: auto; background: #080808; border-radius: 10px; border: 1px solid #151515; }
+        .h-row { display: flex; flex-direction: column; padding: 10px; border-bottom: 1px solid #111; }
+        .h-meta { display: flex; justify-content: space-between; margin-bottom: 8px; font-family: 'Orbitron'; font-size: 12px; color: #444; }
+        
+        /* Number Grid inside History */
+        .n-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+        .n-btn { background: #1a1a1a; border: 1px solid #222; color: #666; padding: 8px 0; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .n-btn.active-r { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .n-btn.active-g { background: var(--success); color: #000; border-color: var(--success); }
+        .n-btn.active-v { background: var(--violet); color: #fff; border-color: var(--violet); }
+
+        .bottom-nav { padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        #sync-status { font-size: 10px; color: var(--success); }
+        .clear-btn { font-size: 10px; color: var(--danger); border: 1px solid var(--danger); padding: 2px 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="pred-header">
+        <div class="target-label">PREDICTION FOR PERIOD</div>
+        <div id="target-period">LOADING...</div>
+        <div id="main-res">READY</div>
+        <div class="suggested-nums" id="suggested-nums">
+            <div class="s-num">?</div><div class="s-num">?</div><div class="s-num">?</div>
+        </div>
+    </div>
+
+    <div class="history-label">
+        <span>INPUT PAST RESULTS (0-9)</span>
+        <span id="timer" style="color:var(--gold)">00:00</span>
+    </div>
+
+    <div class="history-scroll" id="history-list">
+        </div>
+
+    <div class="bottom-nav">
+        <div id="sync-status">● LIVE SYNC ACTIVE</div>
+        <div class="clear-btn" onclick="clearData()">CLEAR DATA</div>
+    </div>
+</div>
+
+<script>
+    let dataStore = JSON.parse(localStorage.getItem('halwa_v10_fast')) || {};
+    let currentLive = "";
+
+    function getLivePeriod() {
+        const now = new Date();
+        const y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0'), d = String(now.getDate()).padStart(2, '0');
+        const seq = (now.getHours() * 60) + now.getMinutes() + 1000; 
+        return `${y}${m}${d}${seq}`;
+    }
+
+    function updateApp() {
+        const now = new Date();
+        const seconds = now.getSeconds();
+        document.getElementById('timer').textContent = `${60 - seconds}s`;
+
+        let newP = getLivePeriod();
+        if (newP !== currentLive) {
+            currentLive = newP;
+            document.getElementById('target-period').textContent = currentLive;
+            renderHistory();
+            calculatePrediction();
+        }
+    }
+
+    function renderHistory() {
+        const container = document.getElementById('history-list');
+        let html = "";
+        let base = BigInt(currentLive);
+
+        // We show from Live-1 down to 20 past periods for fast input
+        for (let i = 1; i <= 30; i++) {
+            let pId = String(base - BigInt(i));
+            let savedNum = dataStore[pId];
+
+            html += `
+                <div class="h-row">
+                    <div class="h-meta">
+                        <span>PERIOD: ${pId}</span>
+                        <span style="color:var(--gold)">${savedNum !== undefined ? 'SAVED' : 'WAITING'}</span>
+                    </div>
+                    <div class="n-grid">
+                        ${[0,1,2,3,4,5,6,7,8,9].map(n => {
+                            let cls = "";
+                            if (savedNum === n) {
+                                if ([0,5].includes(n)) cls = "active-v";
+                                else if ([1,3,7,9].includes(n)) cls = "active-g";
+                                else cls = "active-r";
+                            }
+                            return `<button class="n-btn ${cls}" onclick="saveInput('${pId}', ${n})">${n}</button>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function saveInput(pId, val) {
+        dataStore[pId] = val;
+        localStorage.setItem('halwa_v10_fast', JSON.stringify(dataStore));
+        renderHistory();
+        calculatePrediction();
+    }
+
+    function calculatePrediction() {
+        // Extract last 10 entered results in sequence
+        let base = BigInt(currentLive);
+        let lastValues = [];
+        for(let i=1; i<=50; i++) {
+            let val = dataStore[String(base - BigInt(i))];
+            if(val !== undefined) lastValues.push(val);
+            if(lastValues.length >= 10) break;
+        }
+
+        if (lastValues.length < 5) {
+            document.getElementById('main-res').textContent = "NEED DATA";
+            document.getElementById('main-res').style.color = "#222";
+            return;
+        }
+
+        // Logic: Frequency of Neighbors
+        let lastNum = lastValues[0];
+        let freq = {};
+        lastValues.forEach(v => freq[v] = (freq[v] || 0) + 1);
+        let sorted = Object.keys(freq).sort((a,b) => freq[b] - freq[a]);
+        
+        let top3 = sorted.slice(0, 3).map(Number);
+        while(top3.length < 3) top3.push((lastNum + 1) % 10);
+
+        let isBig = (top3.reduce((a,b)=>a+b,0)/3) >= 5;
+        const resEl = document.getElementById('main-res');
+        resEl.textContent = isBig ? "BIG" : "SMALL";
+        resEl.style.color = isBig ? "var(--danger)" : "var(--success)";
+
+        document.getElementById('suggested-nums').innerHTML = top3.map(n => `<div class="s-num">${n}</div>`).join('');
+    }
+
+    function clearData() {
+        if(confirm("साफ करें?")) { dataStore = {}; localStorage.removeItem('halwa_v10_fast'); renderHistory(); calculatePrediction(); }
+    }
+
+    setInterval(updateApp, 1000);
+    updateApp();
+</script>
+</body>
+</html>
